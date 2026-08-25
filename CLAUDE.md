@@ -10,9 +10,11 @@ Core flow: `Profile` (income, expenses, savings, commitments) → `scoring_servi
 
 `docs/API-CONTRACT.md` is the authoritative technical spec; `docs/MASTER-PACKAGE.md` is the broader business/pitch document and is occasionally looser or inconsistent with the contract (e.g. its Appendix C reference implementation uses ringgit floats, not sen) — the contract always wins on any conflict.
 
-The repo is scaffolded (`main.py`, `pages/`, `utils/`, `services/`, `models/`, `database/`, `tests/`) but domain and service modules are still `NotImplementedError` stubs carrying exact contract signatures — logic is filled in test-first, not invented ahead of a test.
+## Current state
 
-**Team, per `README.md`:** Aliff owns the application layer (Streamlit pages, database, interface — Master Package's "Developer 1" track: §6-§8, §14, §17-§18, §24, tasks `D1-07` onward). Arjun owns the scoring engine, ML pipeline and explanation layer ("Developer 2": §9-§16, §23, tasks `D1-01` onward). Tammy, Thanu and Angel own documentation, business/pitch, and branding/UX respectively (Part I, III, V) and don't touch code.
+The repo is scaffolded: `main.py`, five Streamlit `pages/`, `utils/` (domain layer) and `services/` (orchestration layer) carrying exact contract signatures, `models/` (ML pipeline scripts), `database/schema.sql` + `init_db.py` (fully working, INTEGER-sen columns), `tests/` (one stub file per test group: T-01…T-12), `requirements.txt`, `.env.example`.
+
+**Nothing is implemented yet.** Every function in `utils/` and `services/` raises `NotImplementedError` — write the test against the contract's fixtures first, then the implementation. `database/init_db.py` and `schema.sql` are the only pieces with real logic, since they're mechanical plumbing rather than domain rules.
 
 ## The frozen contract
 
