@@ -217,4 +217,7 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
+# KIRA+ -- runtime SQLite file, recreated by database/init_db.py
+database/kira.db
+
 .idea
