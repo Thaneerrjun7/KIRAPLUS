@@ -1,0 +1,14 @@
+{
+  "extends": [
+    "next/core-web-vitals",
+    "next/typescript"
+  ],
+  "rules": {
+    // Stub functions across this scaffold keep their documented parameter
+    // names before they're implemented (raise "Not implemented" instead of
+    // using them) -- see CLAUDE.md/backend's own NotImplementedError
+    // pattern. Unused *local variables* still error; only unused function
+    // arguments are relaxed.
+    "@typescript-eslint/no-unused-vars": ["error", { "args": "none" }]
+  }
+}

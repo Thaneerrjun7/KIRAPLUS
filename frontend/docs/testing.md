@@ -40,9 +40,13 @@ and tests that it *renders* them correctly, not that they're mathematically corr
      already-fetched array — assert no second network call happens (see integration tests below for
      how to make that assertion meaningfully).
 
-3. **Contract/integration — mock the backend at the `lib/api.ts` boundary, not the network.** Use a
-   fixture-backed mock (MSW or a hand-rolled fetch mock) that returns exactly the shapes
-   `docs/API-CONTRACT.md` §9 documents, including the edge cases the backend explicitly guarantees:
+3. **Contract/integration — mock the backend at the `lib/api.ts` boundary, not the network.** Use
+   `vi.mock("@/lib/api")` (Vitest's built-in mocking) returning fixture-backed responses that match
+   exactly the shapes `docs/API-CONTRACT.md` §9 documents, including the edge cases the backend
+   explicitly guarantees. Decided against adding MSW — mocking at the `lib/api.ts` module boundary
+   (rather than intercepting `fetch` itself) is one fewer dependency and is exactly the boundary
+   `architecture.md` already says is the only thing allowed to call the backend, so mocking there is
+   the natural seam, not a compromise.
    - `p_stress_12m: null` (model artefact absent) must not crash the Dashboard.
    - A `POST /simulate/grid` response is exactly 36 entries, tenures 1–36 in order — a page/component
      that assumes a different length or order should fail its test, not fail silently in production.
@@ -58,26 +62,34 @@ and tests that it *renders* them correctly, not that they're mathematically corr
    confidence but shouldn't block the P0 component/unit work if time runs out — same P0/P1
    prioritization discipline `docs/MASTER-PACKAGE.md` §27 already applies to the backend backlog.
 
-## Tooling (proposed, not yet installed)
+## Tooling — installed and wired up
 
-- **Vitest** + **React Testing Library** for unit/component tests — fast, native ESM, plays well with
-  Next.js's App Router without extra config compared to Jest.
-- **MSW** (Mock Service Worker) for the contract/integration layer — intercepts `fetch` the same way
-  in tests as it would in a browser, so the mocking approach doesn't diverge from how `lib/api.ts`
-  actually calls the backend.
-- **Playwright** for the end-to-end stretch goal.
+- **Vitest** + **React Testing Library** + **@testing-library/jest-dom** for unit/component tests —
+  `vitest.config.mts` (jsdom environment, `@/` path alias matching `tsconfig.json`),
+  `vitest.setup.ts` (jest-dom matchers). Run: `npm test` (once) or `npm run test:watch`.
+- **Playwright** for end-to-end — `playwright.config.ts`, tests under `e2e/`. Run: `npm run test:e2e`
+  (needs `npx playwright install` once for the browser binaries; not run yet since the one e2e spec
+  is still `test.skip`-ed — there's no real page to walk through until the Profile page works).
+- No MSW — mocking happens at the `lib/api.ts` module boundary with `vi.mock`, see above.
+- `next lint`'s default `@typescript-eslint/no-unused-vars` rule was relaxed for unused *function
+  arguments* only (`.eslintrc.json`) — every stub across this scaffold keeps its documented parameter
+  names before it's implemented, and the default rule would otherwise error on every one of them.
 
-None of these are in `frontend/package.json` yet — add them alongside the first test file, not
-speculatively ahead of time.
+Current state: `npm test` runs 2 files — `lib/theme.test.ts` (3 tests, passing: `bandToRisk` is a
+trivial pure mapping and is fully implemented) and `lib/format.test.ts` (8 tests, failing: `fmtRm` /
+`fmtRmCents` / `toSen` are still `NotImplementedError`-equivalent stubs). That split — one green file
+proving the harness works, one red file waiting on an implementation — is what "AI-first TDD" is
+supposed to look like at this stage, not a bug to fix.
 
 ## The fixtures this all depends on
 
-`lib/fixtures.ts` should hold typed copies of the four personas' full `Assessment` shape and at least
-one `Simulation`/`/simulate/grid` response (Aisyah + RM2,400/12mo, per §7), sourced from
-`docs/API-CONTRACT.md` §7 and `data/mock-data.json` — not retyped from memory. If a fixture here ever
-disagrees with the backend's own fixtures, the backend's `data/mock-data.json` wins; update this file
-to match, never the other way around, since `data/mock-data.json` is what §7's frozen numbers are
-read from.
+`lib/fixtures.ts` holds typed copies of the four personas' expected score/band/features/subscores/
+warning codes, plus all six of Aisyah's `simulator_scenarios`, transcribed directly from
+`data/mock-data.json` (not retyped from memory or from Master Package prose — the two occasionally
+give slightly different tenure/price combinations for what reads as "the same" scenario, and
+`data/mock-data.json` is the one the backend's own tests read from). If a fixture here ever disagrees
+with the backend's own fixtures, `data/mock-data.json` wins; update `lib/fixtures.ts` to match, never
+the other way around, and never hand-derive a number that isn't actually in the source file.
 
 ## What "done" looks like for a frontend component (per `docs/MASTER-PACKAGE.md`'s acceptance bar)
 
