@@ -1,0 +1,499 @@
+{
+  "$comment": "KIRA+ demo fixtures. ALL MONETARY VALUES ARE INTEGER SEN (RM1 = 100 sen). Commitments are the source of truth; bnpl_monthly_sen and n_bnpl are derived from them. The 'expected' blocks are assertions — tests T-01, T-08 and T-09 read this file. If a number here drifts, the pitch deck is wrong: stop and fix the engine.",
+  "schema_version": "1.0.0",
+  "engine_version": "1.0.0",
+  "currency": "MYR",
+  "units": "integer_sen",
+  "disclaimer": "Synthetic data. These profiles are constructed to exercise every branch of the scoring engine. They are not real people and not research subjects. No real consumer financial data appears anywhere in this repository.",
+  "personas": [
+    {
+      "id": "aisyah",
+      "label": "Aisyah, 26",
+      "occupation": "Marketing executive",
+      "location": "Kuala Lumpur",
+      "note": "Demo persona. Salaried, disciplined on debt, dangerously thin on savings.",
+      "quote": "I always know I can pay it. I just never know what happens if something goes wrong that month.",
+      "is_demo": true,
+      "profile": {
+        "income_sen": 450000,
+        "fixed_expenses_sen": 198400,
+        "var_expenses_sen": 121600,
+        "savings_sen": 225000,
+        "loan_monthly_sen": 10000
+      },
+      "commitments": [
+        {
+          "commitment_id": 1,
+          "provider": "Atome",
+          "label": "Apparel — Uniqlo & Zara",
+          "kind": "bnpl",
+          "monthly_sen": 15000,
+          "outstanding_sen": 30000,
+          "months_left": 2,
+          "next_due": "2026-09-03"
+        },
+        {
+          "commitment_id": 2,
+          "provider": "SPayLater",
+          "label": "Air fryer & kitchen",
+          "kind": "bnpl",
+          "monthly_sen": 10000,
+          "outstanding_sen": 40000,
+          "months_left": 4,
+          "next_due": "2026-09-11"
+        },
+        {
+          "commitment_id": 3,
+          "provider": "PTPTN",
+          "label": "Student loan",
+          "kind": "loan",
+          "monthly_sen": 10000,
+          "outstanding_sen": 840000,
+          "months_left": 84,
+          "next_due": "2026-09-01"
+        }
+      ],
+      "derived": {
+        "bnpl_monthly_sen": 25000,
+        "n_bnpl": 2,
+        "total_monthly_obligations_sen": 35000,
+        "total_outstanding_sen": 910000
+      },
+      "expected": {
+        "score": 68,
+        "band": "MODERATE RISK",
+        "penalty": 0.0,
+        "buffer_sen": 95000,
+        "outflow_sen": 355000,
+        "dsr": 0.0778,
+        "bnpl_ratio": 0.0556,
+        "buffer_ratio": 0.2111,
+        "runway_months": 0.6338,
+        "coverage": 2.7143,
+        "savings_months": 0.5,
+        "commitment_ratio": 0.7889,
+        "subscores": {
+          "debt_burden": 93.06,
+          "bnpl_exposure": 80.25,
+          "disposable_income": 70.37,
+          "emergency_buffer": 10.56,
+          "repayment_capacity": 100.0,
+          "savings_resilience": 16.67
+        },
+        "warning_codes": [
+          "LOW_BUFFER"
+        ]
+      }
+    },
+    {
+      "id": "daniel",
+      "label": "Daniel, 31",
+      "occupation": "Process engineer",
+      "location": "Penang",
+      "note": "Control case. Proves the scorer is not a shaming tool — it can return green.",
+      "quote": "I don't need an app to tell me I'm fine. I need one that tells me the month I stop being fine.",
+      "is_demo": true,
+      "profile": {
+        "income_sen": 720000,
+        "fixed_expenses_sen": 260000,
+        "var_expenses_sen": 130000,
+        "savings_sen": 2600000,
+        "loan_monthly_sen": 85000
+      },
+      "commitments": [
+        {
+          "commitment_id": 1,
+          "provider": "Maybank",
+          "label": "Car hire purchase",
+          "kind": "loan",
+          "monthly_sen": 62000,
+          "outstanding_sen": 4340000,
+          "months_left": 70,
+          "next_due": "2026-09-05"
+        },
+        {
+          "commitment_id": 2,
+          "provider": "PTPTN",
+          "label": "Student loan",
+          "kind": "loan",
+          "monthly_sen": 23000,
+          "outstanding_sen": 920000,
+          "months_left": 40,
+          "next_due": "2026-09-01"
+        }
+      ],
+      "derived": {
+        "bnpl_monthly_sen": 0,
+        "n_bnpl": 0,
+        "total_monthly_obligations_sen": 85000,
+        "total_outstanding_sen": 5260000
+      },
+      "expected": {
+        "score": 94,
+        "band": "LOW RISK",
+        "penalty": 0.0,
+        "buffer_sen": 245000,
+        "outflow_sen": 475000,
+        "dsr": 0.1181,
+        "bnpl_ratio": 0.0,
+        "buffer_ratio": 0.3403,
+        "runway_months": 5.4737,
+        "coverage": 2.8824,
+        "savings_months": 3.6111,
+        "commitment_ratio": 0.6597,
+        "subscores": {
+          "debt_burden": 82.99,
+          "bnpl_exposure": 100.0,
+          "disposable_income": 100.0,
+          "emergency_buffer": 91.23,
+          "repayment_capacity": 100.0,
+          "savings_resilience": 100.0
+        },
+        "warning_codes": []
+      }
+    },
+    {
+      "id": "weijian",
+      "label": "Wei Jian, 29",
+      "occupation": "P-hailing rider",
+      "location": "Johor Bahru",
+      "note": "Variable income, four concurrent BNPL plans. The profile a per-provider view scores as fine.",
+      "quote": "Good week, no problem. Bad week, I'm choosing which one to pay late.",
+      "is_demo": true,
+      "profile": {
+        "income_sen": 340000,
+        "fixed_expenses_sen": 150000,
+        "var_expenses_sen": 90000,
+        "savings_sen": 90000,
+        "loan_monthly_sen": 26000
+      },
+      "commitments": [
+        {
+          "commitment_id": 1,
+          "provider": "Atome",
+          "label": "Helmet & riding gear",
+          "kind": "bnpl",
+          "monthly_sen": 9000,
+          "outstanding_sen": 18000,
+          "months_left": 2,
+          "next_due": "2026-09-02"
+        },
+        {
+          "commitment_id": 2,
+          "provider": "SPayLater",
+          "label": "Phone accessories",
+          "kind": "bnpl",
+          "monthly_sen": 6000,
+          "outstanding_sen": 24000,
+          "months_left": 4,
+          "next_due": "2026-09-08"
+        },
+        {
+          "commitment_id": 3,
+          "provider": "Grab PayLater",
+          "label": "Groceries",
+          "kind": "bnpl",
+          "monthly_sen": 8000,
+          "outstanding_sen": 16000,
+          "months_left": 2,
+          "next_due": "2026-09-14"
+        },
+        {
+          "commitment_id": 4,
+          "provider": "Boost PayFlex",
+          "label": "Motorcycle tyres",
+          "kind": "bnpl",
+          "monthly_sen": 8000,
+          "outstanding_sen": 32000,
+          "months_left": 4,
+          "next_due": "2026-09-20"
+        },
+        {
+          "commitment_id": 5,
+          "provider": "Bank Rakyat",
+          "label": "Motorcycle loan",
+          "kind": "loan",
+          "monthly_sen": 26000,
+          "outstanding_sen": 780000,
+          "months_left": 30,
+          "next_due": "2026-09-05"
+        }
+      ],
+      "derived": {
+        "bnpl_monthly_sen": 31000,
+        "n_bnpl": 4,
+        "total_monthly_obligations_sen": 57000,
+        "total_outstanding_sen": 870000
+      },
+      "expected": {
+        "score": 41,
+        "band": "HIGH RISK",
+        "penalty": 3.0,
+        "buffer_sen": 43000,
+        "outflow_sen": 297000,
+        "dsr": 0.1676,
+        "bnpl_ratio": 0.0912,
+        "buffer_ratio": 0.1265,
+        "runway_months": 0.303,
+        "coverage": 0.7544,
+        "savings_months": 0.2647,
+        "commitment_ratio": 0.8735,
+        "subscores": {
+          "debt_burden": 70.59,
+          "bnpl_exposure": 60.46,
+          "disposable_income": 42.16,
+          "emergency_buffer": 5.05,
+          "repayment_capacity": 37.72,
+          "savings_resilience": 8.82
+        },
+        "warning_codes": [
+          "LOW_BUFFER",
+          "MULTI_COMMIT"
+        ]
+      }
+    },
+    {
+      "id": "farah",
+      "label": "Farah, 23",
+      "occupation": "Graduate trainee",
+      "location": "Shah Alam",
+      "note": "Five commitments, RM60 of monthly slack. Every unplanned expense is financed by another plan.",
+      "quote": "Each one was only about a hundred ringgit a month. I genuinely didn't add them up.",
+      "is_demo": true,
+      "profile": {
+        "income_sen": 290000,
+        "fixed_expenses_sen": 145000,
+        "var_expenses_sen": 78000,
+        "savings_sen": 35000,
+        "loan_monthly_sen": 18000
+      },
+      "commitments": [
+        {
+          "commitment_id": 1,
+          "provider": "Atome",
+          "label": "Laptop",
+          "kind": "bnpl",
+          "monthly_sen": 16000,
+          "outstanding_sen": 96000,
+          "months_left": 6,
+          "next_due": "2026-09-04"
+        },
+        {
+          "commitment_id": 2,
+          "provider": "Boost PayFlex",
+          "label": "Mobile phone",
+          "kind": "bnpl",
+          "monthly_sen": 8000,
+          "outstanding_sen": 64000,
+          "months_left": 8,
+          "next_due": "2026-09-07"
+        },
+        {
+          "commitment_id": 3,
+          "provider": "SPayLater",
+          "label": "Skincare",
+          "kind": "bnpl",
+          "monthly_sen": 7000,
+          "outstanding_sen": 21000,
+          "months_left": 3,
+          "next_due": "2026-09-12"
+        },
+        {
+          "commitment_id": 4,
+          "provider": "SPayLater",
+          "label": "Clothing",
+          "kind": "bnpl",
+          "monthly_sen": 6000,
+          "outstanding_sen": 12000,
+          "months_left": 2,
+          "next_due": "2026-09-18"
+        },
+        {
+          "commitment_id": 5,
+          "provider": "Grab PayLater",
+          "label": "Food delivery",
+          "kind": "bnpl",
+          "monthly_sen": 6000,
+          "outstanding_sen": 12000,
+          "months_left": 2,
+          "next_due": "2026-09-22"
+        },
+        {
+          "commitment_id": 6,
+          "provider": "PTPTN",
+          "label": "Student loan",
+          "kind": "loan",
+          "monthly_sen": 18000,
+          "outstanding_sen": 640000,
+          "months_left": 40,
+          "next_due": "2026-09-01"
+        }
+      ],
+      "derived": {
+        "bnpl_monthly_sen": 43000,
+        "n_bnpl": 5,
+        "total_monthly_obligations_sen": 61000,
+        "total_outstanding_sen": 845000
+      },
+      "expected": {
+        "score": 17,
+        "band": "HIGH RISK",
+        "penalty": 6.0,
+        "buffer_sen": 6000,
+        "outflow_sen": 284000,
+        "dsr": 0.2103,
+        "bnpl_ratio": 0.1483,
+        "buffer_ratio": 0.0207,
+        "runway_months": 0.1232,
+        "coverage": 0.0984,
+        "savings_months": 0.1207,
+        "commitment_ratio": 0.9793,
+        "subscores": {
+          "debt_burden": 59.91,
+          "bnpl_exposure": 28.74,
+          "disposable_income": 6.9,
+          "emergency_buffer": 2.05,
+          "repayment_capacity": 4.92,
+          "savings_resilience": 4.02
+        },
+        "warning_codes": [
+          "LOW_BUFFER",
+          "OVERCOMMITTED",
+          "THIN_SLACK",
+          "MULTI_COMMIT"
+        ]
+      }
+    }
+  ],
+  "simulator_scenarios": [
+    {
+      "name": "Headphones",
+      "persona_id": "aisyah",
+      "price_sen": 60000,
+      "tenure_months": 6,
+      "monthly_sen": 10000,
+      "expected": {
+        "score_before": 68,
+        "score_after": 62,
+        "delta": -6,
+        "buffer_before_sen": 95000,
+        "buffer_after_sen": 85000,
+        "band_before": "MODERATE RISK",
+        "band_after": "MODERATE RISK",
+        "band_changed": false
+      }
+    },
+    {
+      "name": "Furniture",
+      "persona_id": "aisyah",
+      "price_sen": 180000,
+      "tenure_months": 24,
+      "monthly_sen": 7500,
+      "expected": {
+        "score_before": 68,
+        "score_after": 64,
+        "delta": -4,
+        "buffer_before_sen": 95000,
+        "buffer_after_sen": 87500,
+        "band_before": "MODERATE RISK",
+        "band_after": "MODERATE RISK",
+        "band_changed": false
+      }
+    },
+    {
+      "name": "Mobile phone",
+      "persona_id": "aisyah",
+      "price_sen": 240000,
+      "tenure_months": 12,
+      "monthly_sen": 20000,
+      "expected": {
+        "score_before": 68,
+        "score_after": 54,
+        "delta": -14,
+        "buffer_before_sen": 95000,
+        "buffer_after_sen": 75000,
+        "band_before": "MODERATE RISK",
+        "band_after": "MODERATE RISK",
+        "band_changed": false
+      }
+    },
+    {
+      "name": "Laptop",
+      "persona_id": "aisyah",
+      "price_sen": 360000,
+      "tenure_months": 12,
+      "monthly_sen": 30000,
+      "expected": {
+        "score_before": 68,
+        "score_after": 46,
+        "delta": -22,
+        "buffer_before_sen": 95000,
+        "buffer_after_sen": 65000,
+        "band_before": "MODERATE RISK",
+        "band_after": "MODERATE RISK",
+        "band_changed": false
+      }
+    },
+    {
+      "name": "Holiday",
+      "persona_id": "aisyah",
+      "price_sen": 480000,
+      "tenure_months": 6,
+      "monthly_sen": 80000,
+      "expected": {
+        "score_before": 68,
+        "score_after": 18,
+        "delta": -50,
+        "buffer_before_sen": 95000,
+        "buffer_after_sen": 15000,
+        "band_before": "MODERATE RISK",
+        "band_after": "HIGH RISK",
+        "band_changed": true
+      }
+    },
+    {
+      "name": "Mobile phone, stretched to 24 months",
+      "persona_id": "aisyah",
+      "price_sen": 240000,
+      "tenure_months": 24,
+      "monthly_sen": 10000,
+      "expected": {
+        "score_before": 68,
+        "score_after": 62,
+        "delta": -6,
+        "buffer_before_sen": 95000,
+        "buffer_after_sen": 85000,
+        "band_before": "MODERATE RISK",
+        "band_after": "MODERATE RISK",
+        "band_changed": false
+      }
+    }
+  ],
+  "warning_rules": [
+    {
+      "code": "HIGH_BNPL",
+      "level": "red"
+    },
+    {
+      "code": "LOW_BUFFER",
+      "level": "red"
+    },
+    {
+      "code": "OVERCOMMITTED",
+      "level": "red"
+    },
+    {
+      "code": "THIN_SLACK",
+      "level": "amber"
+    },
+    {
+      "code": "MULTI_COMMIT",
+      "level": "amber"
+    },
+    {
+      "code": "MODEL_STRESS",
+      "level": "amber",
+      "note": "p_stress_12m > 0.50; requires models/stress_model.pkl"
+    }
+  ]
+}

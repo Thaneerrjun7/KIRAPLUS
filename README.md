@@ -187,7 +187,7 @@ Built for the **MAIC Nexus Challenge 2026**, Track T3 — AI for Financial Servi
 | Role | Owner |
 |---|---|
 | Scoring engine, ML pipeline, explanation layer | Arjun |
-| Application, database, interface | Ariff |
+| Application, database, interface | Aliff |
 | Documentation, research, source verification | Tammy |
 | Pitch, business model, commercial narrative | Thanu |
 | Branding, UX, compliance and AI usage disclosure | Angel |
