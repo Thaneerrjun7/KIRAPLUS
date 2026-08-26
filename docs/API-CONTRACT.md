@@ -315,6 +315,7 @@ changes what a §2-§5 function returns.
 | `GET /profiles/demo/{name}` | `profile_service.load_demo` | — | `Profile` |
 | `POST /assess` | `scoring_service.assess` | `Profile` | `Assessment` |
 | `POST /simulate` | `simulation_service.simulate` | `{profile, price_sen, tenure_months}` | `Simulation` |
+| `POST /simulate/grid` | `simulation_service.simulate_grid` | `{profile, price_sen}` | `[{tenure_months, monthly_sen, score, band, delta}]`, tenures 1–36 |
 | `POST /explain` | `llm_service.explain` | payload (§5) | `{text, source}` |
 | `GET /health` | — | — | `{status: "ok"}` |
 
@@ -323,3 +324,27 @@ introduce a new type system, just a transport. CORS is restricted to the fronten
 (`CORS_ALLOWED_ORIGINS` in `backend/.env.example`). The FastAPI layer (`backend/app/`) must never
 contain scoring, warning, or simulation logic itself — only routing into `services/*.py`, same
 constraint §2-§5 already put on the old Streamlit pages.
+
+### `POST /simulate/grid` in detail
+
+Solves a UI problem, not a domain one: the simulator's tenure slider has 36 positions, and calling
+`POST /simulate` once per position while dragging means up to 18 round-trips for one drag gesture —
+the stutter the move off Streamlit was partly meant to avoid. `simulate_grid` runs the *same*
+`simulate(profile, price_sen, tenure_months)` for every `tenure_months` in `1..36` and returns the
+reduced fields as one array, so the frontend fetches once (on page load or price change) and reads
+`grid[tenure - 1]` locally thereafter.
+
+```jsonc
+// simulate_grid(aisyah, price_sen=240000) — abridged, full response has 36 entries
+[
+  {"tenure_months":  1, "monthly_sen": 240000, "score":  2, "band": "HIGH RISK",     "delta": -66},
+  {"tenure_months":  6, "monthly_sen":  40000, "score": 39, "band": "HIGH RISK",     "delta": -29},
+  {"tenure_months": 12, "monthly_sen":  20000, "score": 54, "band": "MODERATE RISK", "delta": -14},
+  {"tenure_months": 24, "monthly_sen":  10000, "score": 62, "band": "MODERATE RISK", "delta":  -6},
+  {"tenure_months": 36, "monthly_sen":   6667, "score": 65, "band": "MODERATE RISK", "delta":  -3}
+]
+```
+
+No `contract_version` bump: it computes nothing `simulate()` doesn't already compute, and introduces
+no new fixture number to freeze — every value above is derived live from a profile, not stored in
+`data/mock-data.json`. The 12/24-month rows above are consistent with the frozen §7 fixture table.
