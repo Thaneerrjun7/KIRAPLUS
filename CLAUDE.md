@@ -12,9 +12,14 @@ Core flow: `Profile` (income, expenses, savings, commitments) → `scoring_servi
 
 ## Current state
 
-The repo is scaffolded: `main.py`, five Streamlit `pages/`, `utils/` (domain layer) and `services/` (orchestration layer) carrying exact contract signatures, `models/` (ML pipeline scripts), `database/schema.sql` + `init_db.py` (fully working, INTEGER-sen columns), `tests/` (one stub file per test group: T-01…T-12), `requirements.txt`, `.env.example`.
+The application layer moved off Streamlit to a **Next.js frontend + FastAPI backend**, split as a monorepo:
 
-**Nothing is implemented yet.** Every function in `utils/` and `services/` raises `NotImplementedError` — write the test against the contract's fixtures first, then the implementation. `database/init_db.py` and `schema.sql` are the only pieces with real logic, since they're mechanical plumbing rather than domain rules.
+- `frontend/` — Next.js (App Router, TypeScript). Presentation only: five pages (`app/profile`, `app/commitments`, `app/dashboard`, `app/simulator`, `app/about`), `lib/format.ts` (the sen→ringgit conversion, now the real presentation layer — see "The unit rule" below), `lib/api.ts` (FastAPI client).
+- `backend/` — Python. `app/` is the new FastAPI transport (`main.py` + `routers/`), a thin wrapper that calls into `services/*.py` and adds no domain logic of its own (see `docs/API-CONTRACT.md` §9). `utils/` (domain layer) and `services/` (orchestration layer) carry the exact contract signatures unchanged. `models/` (ML pipeline scripts), `database/schema.sql` + `init_db.py` (fully working, INTEGER-sen columns), `tests/` (one stub file per test group: T-01…T-12), `requirements.txt`, `.env.example`.
+
+**Nothing is implemented yet.** Every function in `backend/utils/` and `backend/services/` raises `NotImplementedError` — write the test against the contract's fixtures first, then the implementation. `backend/database/init_db.py` and `schema.sql` are the only pieces with real logic, since they're mechanical plumbing rather than domain rules. The FastAPI routers and Next.js pages are wiring/placeholders, not implementations.
+
+Run locally: `uvicorn app.main:app --reload` from `backend/` (after `pip install -r requirements.txt`); `npm run dev` from `frontend/` (after `npm install`).
 
 ## The frozen contract
 
@@ -31,8 +36,8 @@ Do not change any function signature, warning code, or fixture number without fl
 
 Every monetary value crossing the API contract boundary is an **integer number of sen**. No floats, no ringgit, below the presentation layer.
 
-- SQLite columns, domain function arguments/returns, and service payloads: integer sen (e.g. `income_sen=450000`).
-- Only `utils/format.py` converts sen to a displayed ringgit string (`fmt_rm`, `fmt_rm_cents`, `to_sen`), and only the presentation layer may call it.
+- SQLite columns, domain function arguments/returns, service payloads, and every FastAPI request/response body: integer sen (e.g. `income_sen=450000`). The HTTP boundary between `frontend/` and `backend/` does not change this — JSON carries sen, not ringgit.
+- `frontend/lib/format.ts` is now the only sen→ringgit conversion point (`fmtRm`, `fmtRmCents`, `toSen`), since the presentation layer is the Next.js app, not Python. `backend/utils/format.py` still documents the equivalent Python functions but is no longer on the runtime display path.
 - The KIRA Score itself is unit-invariant (every scoring factor is a ratio), but absolute quantities like `buffer_sen` are not — getting the unit wrong won't break the score, but it will silently break every figure on screen.
 
 ## Git workflow

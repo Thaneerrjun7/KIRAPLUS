@@ -30,6 +30,11 @@ def fmt_rm_cents(sen: int) -> str # 95000 -> "RM950.00"
 def to_sen(ringgit: float) -> int # 950.0 -> 95000, banker-safe
 ```
 
+> **Update, §9:** the presentation layer moved from Streamlit to a Next.js frontend (see §9). The
+> conversions above now live in `frontend/lib/format.ts`, not `utils/format.py` — `utils/format.py`
+> still documents the same functions but is no longer on the runtime display path. Nothing about the
+> rule itself changed: sen crosses every interface below presentation, ringgit is presentation-only.
+
 **The KIRA Score is unit-invariant.** Every scoring factor is a ratio, so a profile expressed in sen
 and the same profile expressed in ringgit produce an identical score. This is verified over 2,000
 random profiles — see test `T-13`. Only absolute quantities (`buffer_sen`) carry the unit. This means
@@ -292,3 +297,29 @@ Counts exclude `MODEL_STRESS`, which requires the model artefact and may add one
 4. Re-run `pytest -q`. All tests green before merge to `main`.
 
 A change that alters any number in section 7 is a change to the pitch deck as well. Tell Person 3.
+
+---
+
+## 9. HTTP transport (FastAPI)
+
+The application layer is a Next.js frontend talking to a FastAPI backend over JSON. This section
+documents the transport only — it wraps §2-§5 verbatim and changes no signature, no warning code and
+no fixture. Adding or reshaping a route here does **not** require a `contract_version` bump unless it
+changes what a §2-§5 function returns.
+
+| Route | Wraps | Request body | Response |
+|---|---|---|---|
+| `POST /profiles` | `profile_service.save_profile` | `Profile` | `{profile_id, updated_at}` |
+| `GET /profiles/{profile_id}` | `profile_service.load_profile` | — | `Profile` |
+| `GET /profiles` | `profile_service.list_profiles` | — | `[{profile_id, label, is_demo, updated_at}]` |
+| `GET /profiles/demo/{name}` | `profile_service.load_demo` | — | `Profile` |
+| `POST /assess` | `scoring_service.assess` | `Profile` | `Assessment` |
+| `POST /simulate` | `simulation_service.simulate` | `{profile, price_sen, tenure_months}` | `Simulation` |
+| `POST /explain` | `llm_service.explain` | payload (§5) | `{text, source}` |
+| `GET /health` | — | — | `{status: "ok"}` |
+
+Every request/response body is the same integer-sen JSON already defined in §1-§5 — HTTP does not
+introduce a new type system, just a transport. CORS is restricted to the frontend's origin
+(`CORS_ALLOWED_ORIGINS` in `backend/.env.example`). The FastAPI layer (`backend/app/`) must never
+contain scoring, warning, or simulation logic itself — only routing into `services/*.py`, same
+constraint §2-§5 already put on the old Streamlit pages.
