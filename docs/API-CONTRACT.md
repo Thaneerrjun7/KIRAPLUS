@@ -30,6 +30,11 @@ def fmt_rm_cents(sen: int) -> str # 95000 -> "RM950.00"
 def to_sen(ringgit: float) -> int # 950.0 -> 95000, banker-safe
 ```
 
+> **Update, §9:** the presentation layer moved from Streamlit to a Next.js frontend (see §9). The
+> conversions above now live in `frontend/lib/format.ts`, not `utils/format.py` — `utils/format.py`
+> still documents the same functions but is no longer on the runtime display path. Nothing about the
+> rule itself changed: sen crosses every interface below presentation, ringgit is presentation-only.
+
 **The KIRA Score is unit-invariant.** Every scoring factor is a ratio, so a profile expressed in sen
 and the same profile expressed in ringgit produce an identical score. This is verified over 2,000
 random profiles — see test `T-13`. Only absolute quantities (`buffer_sen`) carry the unit. This means
@@ -292,3 +297,54 @@ Counts exclude `MODEL_STRESS`, which requires the model artefact and may add one
 4. Re-run `pytest -q`. All tests green before merge to `main`.
 
 A change that alters any number in section 7 is a change to the pitch deck as well. Tell Person 3.
+
+---
+
+## 9. HTTP transport (FastAPI)
+
+The application layer is a Next.js frontend talking to a FastAPI backend over JSON. This section
+documents the transport only — it wraps §2-§5 verbatim and changes no signature, no warning code and
+no fixture. Adding or reshaping a route here does **not** require a `contract_version` bump unless it
+changes what a §2-§5 function returns.
+
+| Route | Wraps | Request body | Response |
+|---|---|---|---|
+| `POST /profiles` | `profile_service.save_profile` | `Profile` | `{profile_id, updated_at}` |
+| `GET /profiles/{profile_id}` | `profile_service.load_profile` | — | `Profile` |
+| `GET /profiles` | `profile_service.list_profiles` | — | `[{profile_id, label, is_demo, updated_at}]` |
+| `GET /profiles/demo/{name}` | `profile_service.load_demo` | — | `Profile` |
+| `POST /assess` | `scoring_service.assess` | `Profile` | `Assessment` |
+| `POST /simulate` | `simulation_service.simulate` | `{profile, price_sen, tenure_months}` | `Simulation` |
+| `POST /simulate/grid` | `simulation_service.simulate_grid` | `{profile, price_sen}` | `[{tenure_months, monthly_sen, score, band, delta}]`, tenures 1–36 |
+| `POST /explain` | `llm_service.explain` | payload (§5) | `{text, source}` |
+| `GET /health` | — | — | `{status: "ok"}` |
+
+Every request/response body is the same integer-sen JSON already defined in §1-§5 — HTTP does not
+introduce a new type system, just a transport. CORS is restricted to the frontend's origin
+(`CORS_ALLOWED_ORIGINS` in `backend/.env.example`). The FastAPI layer (`backend/app/`) must never
+contain scoring, warning, or simulation logic itself — only routing into `services/*.py`, same
+constraint §2-§5 already put on the old Streamlit pages.
+
+### `POST /simulate/grid` in detail
+
+Solves a UI problem, not a domain one: the simulator's tenure slider has 36 positions, and calling
+`POST /simulate` once per position while dragging means up to 18 round-trips for one drag gesture —
+the stutter the move off Streamlit was partly meant to avoid. `simulate_grid` runs the *same*
+`simulate(profile, price_sen, tenure_months)` for every `tenure_months` in `1..36` and returns the
+reduced fields as one array, so the frontend fetches once (on page load or price change) and reads
+`grid[tenure - 1]` locally thereafter.
+
+```jsonc
+// simulate_grid(aisyah, price_sen=240000) — abridged, full response has 36 entries
+[
+  {"tenure_months":  1, "monthly_sen": 240000, "score":  2, "band": "HIGH RISK",     "delta": -66},
+  {"tenure_months":  6, "monthly_sen":  40000, "score": 39, "band": "HIGH RISK",     "delta": -29},
+  {"tenure_months": 12, "monthly_sen":  20000, "score": 54, "band": "MODERATE RISK", "delta": -14},
+  {"tenure_months": 24, "monthly_sen":  10000, "score": 62, "band": "MODERATE RISK", "delta":  -6},
+  {"tenure_months": 36, "monthly_sen":   6667, "score": 65, "band": "MODERATE RISK", "delta":  -3}
+]
+```
+
+No `contract_version` bump: it computes nothing `simulate()` doesn't already compute, and introduces
+no new fixture number to freeze — every value above is derived live from a profile, not stored in
+`data/mock-data.json`. The 12/24-month rows above are consistent with the frozen §7 fixture table.

@@ -14,8 +14,8 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
-lib64/
+/lib/
+/lib64/
 parts/
 sdist/
 var/
@@ -217,7 +217,14 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-# KIRA+ -- runtime SQLite file, recreated by database/init_db.py
-database/kira.db
+# KIRA+ -- runtime SQLite file, recreated by backend/database/init_db.py
+backend/database/kira.db
+
+# Node / Next.js (frontend/)
+node_modules/
+.next/
+out/
+next-env.d.ts
+frontend/.env.local
 
 .idea

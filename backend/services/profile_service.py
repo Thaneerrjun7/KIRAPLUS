@@ -1,4 +1,4 @@
-"""Profile CRUD orchestration. Must never import streamlit.
+"""Profile CRUD orchestration. Must never import fastapi.
 
 See docs/API-CONTRACT.md §2. This is the only module that touches the
 profiles / commitments tables.

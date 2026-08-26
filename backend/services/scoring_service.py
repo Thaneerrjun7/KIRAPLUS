@@ -1,4 +1,4 @@
-"""The single entry point the UI calls for a score. Must never import streamlit.
+"""The single entry point the UI calls for a score. Must never import fastapi.
 
 Orchestrates features -> score -> model -> warnings. See docs/API-CONTRACT.md
 §3 for the canonical Assessment shape and its invariants.

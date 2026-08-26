@@ -133,47 +133,67 @@ The four demo personas are constructed to exercise every branch of the scoring e
 
 ## Stack
 
-- **Application** — Streamlit (multipage), Plotly
+- **Frontend** — Next.js (App Router, TypeScript)
+- **Backend** — FastAPI, a thin HTTP transport over the domain layer (see `docs/API-CONTRACT.md` §9)
 - **Domain layer** — pure Python, zero third-party imports, fully unit-testable
 - **ML** — scikit-learn, pandas, NumPy
 - **Data** — SQLite; all monetary values stored as integer sen
-- **Hosting** — Streamlit Community Cloud
+- **Hosting** — Vercel (frontend), a container host such as Render or Fly.io (backend)
 
-Streamlit was chosen so that two developers could ship six working features in three days. It is a prototype choice, not an architecture: the domain layer has no framework dependency and lifts into a FastAPI service unchanged.
+The project started on Streamlit for a fast single-process prototype, then split into this two-service
+layout once the team wanted a real frontend framework. The domain layer (`backend/utils/`,
+`backend/services/`, `backend/models/`) has zero framework dependency either way — it moved directories,
+not shape.
 
 ## Repository layout
 
 ```
-main.py                    Streamlit entry point
-pages/                     Profile · Commitments · Dashboard · Simulator · About
-utils/                     DOMAIN — pure Python, no third-party imports
-  features.py                11 derived features
-  scoring.py                 KIRA Score engine
-  simulate.py                what-if arithmetic
-  warnings.py                early-warning rules
-  explain.py                 deterministic explanation templates
-services/                  orchestration — no streamlit imports
-models/                    synthetic generation, Monte-Carlo labels, training, MODEL_CARD.md
+frontend/                  Next.js app — presentation only
+  app/                       Profile · Commitments · Dashboard · Simulator · About
+  lib/format.ts              the sen -> ringgit conversion point (see the unit rule)
+  lib/api.ts                 FastAPI client
+backend/
+  app/                       FastAPI transport — main.py + routers/, wraps services/*.py over HTTP
+  utils/                     DOMAIN — pure Python, no third-party imports
+    features.py                11 derived features
+    scoring.py                 KIRA Score engine
+    simulate.py                what-if arithmetic
+    warnings.py                early-warning rules
+    explain.py                 deterministic explanation templates
+  services/                 orchestration — no FastAPI/HTTP imports
+  models/                    synthetic generation, Monte-Carlo labels, training, MODEL_CARD.md
+  database/                  schema.sql, init_db.py
+  tests/                     12 tests — run before every push
 data/                      synthetic profiles, demo personas, knowledge base
-database/                  schema.sql, init_db.py
-tests/                     12 tests — run before every push
 docs/                      master package, API-CONTRACT.md, demo script
 ```
 
 `docs/API-CONTRACT.md` is the frozen interface between the application and the domain layer. Neither side changes it unilaterally.
 
-**Architectural rule:** `utils/scoring.py` must never import `streamlit`. If it does, the engine can no longer be tested without launching the app and the two developers become coupled.
+**Architectural rule:** `backend/utils/scoring.py` must never import `fastapi` (or, previously, `streamlit`). If it does, the engine can no longer be tested without launching the app and the two developers become coupled.
 
 ## Running it
 
+Backend:
+
 ```bash
+cd backend
 pip install -r requirements.txt
-streamlit run main.py
+uvicorn app.main:app --reload
 ```
 
-No configuration required. `LLM_API_KEY` is optional — without it, explanations render from deterministic templates and every core feature still works.
+Frontend:
 
 ```bash
+cd frontend
+npm install
+npm run dev
+```
+
+No configuration required for either. `LLM_API_KEY` is optional — without it, explanations render from deterministic templates and every core feature still works.
+
+```bash
+cd backend
 pytest -q                  # 12 tests, runs in under 10 seconds
 python utils/scoring.py    # prints the four persona fixtures: 68 / 94 / 41 / 17
 ```
