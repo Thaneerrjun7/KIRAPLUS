@@ -10,6 +10,8 @@ Core flow: `Profile` (income, expenses, savings, commitments) → `scoring_servi
 
 `docs/API-CONTRACT.md` is the authoritative technical spec; `docs/MASTER-PACKAGE.md` is the broader business/pitch document and is occasionally looser or inconsistent with the contract (e.g. its Appendix C reference implementation uses ringgit floats, not sen) — the contract always wins on any conflict.
 
+`docs/` holds four different kinds of document and they don't get the same treatment: `API-CONTRACT.md` is frozen (§8 governs changing it); `MASTER-PACKAGE.md` is a historical record of the original plan — don't edit it to match later decisions, record contradictions elsewhere instead; `HANDOFF.md` and `superpowers/` are living and expected to be kept current as the team's decisions evolve. `docs/` itself holds documentation only — agent instructions belong in this file and in `frontend/CLAUDE.md` / `backend/CLAUDE.md`, not inside `docs/`.
+
 ## Current state
 
 The application layer moved off Streamlit to a **Next.js frontend + FastAPI backend**, split as a monorepo:
