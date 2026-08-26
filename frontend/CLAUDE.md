@@ -47,5 +47,12 @@ so nothing here needs to change once those stop raising `NotImplementedError`.
 
 ```bash
 npm install
-npm run dev   # :3000, calls http://localhost:8000
+npm run dev        # :3000, calls http://localhost:8000
+npm test            # Vitest, once
+npm run test:watch  # Vitest, watch mode
+npm run test:e2e    # Playwright (needs `npx playwright install` once)
 ```
+
+Write the test in `lib/` (or eventually `components/`) against `lib/fixtures.ts` before writing the
+implementation — same TDD-first rule `backend/CLAUDE.md` states for the Python side. See
+`frontend/docs/testing.md` for the full test pyramid and what's already wired up.
