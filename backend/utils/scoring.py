@@ -1,7 +1,7 @@
 """KIRA Score engine. Pure Python, zero third-party imports.
 
-This module must never import streamlit -- if it does, the engine can no
-longer be tested without launching the app.
+This module must never import a web framework (fastapi or otherwise) -- if
+it does, the engine can no longer be tested without launching the app.
 
 Weights, anchors and the penalty formula are specified in
 docs/MASTER-PACKAGE.md Part II §12 and docs/API-CONTRACT.md §3. Persona
