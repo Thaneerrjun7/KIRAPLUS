@@ -43,8 +43,9 @@ contract rule) — that now includes the HTTP shapes in §9, which are a 1:1 wra
   moment those stop raising `NotImplementedError`, real numbers flow through with no transport code
   changing.
 - **Where you actually need to talk:** any change to `docs/API-CONTRACT.md`, a `services/*.py`
-  signature, or `backend/services/simulation_service.py` (the one file you both write in). Everything
-  else — `frontend/`, `backend/app/`, `backend/utils/`, `backend/models/` internals — can move
+  signature, or `backend/services/simulation_service.py` (the one file you both write in — e.g.
+  `simulate_grid`, the tenure-slider batching helper, already landed there). Everything else —
+  `frontend/`, `backend/app/`, `backend/utils/`, `backend/models/` internals — can move
   independently.
 
 ## Local setup
@@ -69,7 +70,7 @@ npm run dev                     # serves the UI on :3000, calls http://localhost
 Both `backend/.env.example` and `frontend/.env.example` are checked in — copy each to `.env` /
 `.env.local` in its own directory; never commit the real files.
 
-## What to check before merging into this into `main`
+## What to check before merging this into `main`
 
 `feat/nextjs-fastapi-migration` is flagged **High** level of change in its PR (#3) because it moves
 the directories Arjun's work lives under, even though it changes no signature inside them. Per the

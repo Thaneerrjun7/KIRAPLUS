@@ -49,7 +49,9 @@ One Python process serves both the REST API and the domain/ML logic — no separ
 Done (scaffold only, all raise `NotImplementedError` / render placeholders):
 
 - `backend/app/main.py` + `backend/app/routers/{profiles,assessments,simulations,explanations}.py` —
-  route skeletons wrapping each `services/*.py` function 1:1, per `docs/API-CONTRACT.md` §9.
+  route skeletons wrapping each `services/*.py` function 1:1, per `docs/API-CONTRACT.md` §9. Includes
+  `POST /simulate/grid` (batches `simulate()` over tenures 1-36 for the slider — added after this
+  scaffold pass, see §9's "in detail" subsection).
 - `frontend/app/{profile,commitments,dashboard,simulator,about}/page.tsx` — one placeholder page per
   MVP screen.
 - `frontend/lib/format.ts`, `frontend/lib/api.ts` — the new presentation-layer conversion point and
@@ -74,15 +76,17 @@ real bodies, verify:
 1. **CORS** — a request from `http://localhost:3000` to a `backend/` running on `:8000` succeeds
    (`CORS_ALLOWED_ORIGINS` must include the frontend's actual origin in every environment, including
    whatever Vercel preview/prod domains are used).
-2. **Unit rule holds across HTTP** — every JSON body in/out of `/profiles`, `/assess`, `/simulate` is
-   integer sen, never a float or a `"RM..."` string. A quick check: `grep` the response bodies for a
-   decimal point where an amount field is expected.
+2. **Unit rule holds across HTTP** — every JSON body in/out of `/profiles`, `/assess`, `/simulate`,
+   and `/simulate/grid` is integer sen, never a float or a `"RM..."` string. A quick check: `grep`
+   the response bodies for a decimal point where an amount field is expected.
 3. **Existing pytest suite is unaffected by the move** — `cd backend && pytest -q` still discovers
    and (once implemented) passes T-01…T-13; the directory move alone should not change any test
    outcome.
 4. **Fixture parity still holds over HTTP** — `POST /profiles/demo/aisyah` then `POST /assess` should
    reproduce score 68 exactly like calling `scoring_service.assess()` directly; same for
    daniel/weijian/farah. This is the HTTP-boundary equivalent of test `T-13`'s unit-invariance check.
+   `POST /simulate/grid`'s row for `tenure_months=12` (and 24) should match the frozen §7 fixture
+   numbers exactly, since it's the same `simulate()` call under the hood.
 5. **`explain` still meets its 4-second / never-raises guarantee through HTTP** — the added network
    hop (frontend → FastAPI → LLM provider) must not push the effective latency budget users see past
    what `docs/API-CONTRACT.md` §5 promises; time it end-to-end, not just inside `llm_service.explain`.
