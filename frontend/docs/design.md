@@ -24,9 +24,39 @@ Carried over verbatim from the Master Package — the brand doesn't change with 
 **Must not look like:** childish, overly corporate, generic banking blue, an AI robot, or a BNPL
 shopping app.
 
-**Clay red, not emergency red**, for HIGH risk / red warnings — a specific enough distinction to
-tune once real hex values are picked (the palette above doesn't name a clay-red hex; pick one that
-reads as "attention" rather than "system error").
+## Risk / band colors — decided
+
+Reuse two colors already in the palette rather than inventing a generic traffic-light set, and add
+exactly one new one:
+
+| Band | Color | Hex | Source |
+|---|---|---|---|
+| LOW RISK (green) | Jade | `#1E8E7E` | Already in the palette — reads as calm/trustworthy, not a foreign green. |
+| MODERATE RISK (amber) | Songket gold | `#B7791B` | Already in the palette. |
+| HIGH RISK (clay red) | Clay red | `#B5533C` | New. A burnt terracotta, warm against the gold, deliberately not a saturated alert red (`#FF0000`) that would clash with the calm/trustworthy tone. |
+
+**Centralize these in `frontend/tailwind.config.ts`**, not scattered as raw hex in components:
+
+```ts
+colors: {
+  navy: '#0B1F2A', teal: '#0F5C56', jade: '#1E8E7E', gold: '#B7791B', paper: '#FBFAF7',
+  risk: { low: '#1E8E7E', moderate: '#B7791B', high: '#B5533C' },
+}
+```
+
+Components use `bg-risk-low` / `text-risk-high` etc., never a hardcoded hex. Add one small helper
+alongside `lib/format.ts` — e.g. `bandToRisk(band: Band): "low" | "moderate" | "high"` — so the
+`"LOW RISK" → jade` mapping itself lives in exactly one place, the same "one conversion point"
+principle the unit rule already applies to currency.
+
+## Chart choices — decided
+
+| Element | Choice | Why |
+|---|---|---|
+| Score gauge | Hand-rolled SVG semicircle arc (no charting library) | A gauge is one arc + a fill percentage — a library adds weight for something this simple, and a custom SVG gets exact brand control (IBM Plex Mono for the number, `risk.*` fill color, matches the "measuring instrument" iconography directly). |
+| Six-factor breakdown | **Recharts** horizontal bar chart | Mature, good Next.js support, matches the Master Package's own original suggestion (Plotly horizontal bar), and naturally colors each bar by the Strong/Adequate/Weak/Critical classification using the same `risk.*` tokens. |
+
+Recharts is the only charting dependency this adds — don't reach for a second library for the gauge.
 
 ## UI rules
 
@@ -44,10 +74,10 @@ mechanism is now React/Next.js instead of `st.*` calls.
 - **Cache what doesn't change per interaction** — the equivalent of `@st.cache_resource` here is:
   don't refetch the demo persona fixtures or re-run `/simulate/grid` on every render; fetch once,
   read from state.
-- **Design for the actual demo conditions**: a projector at 1280×720 is the historical target from
-  the Streamlit build and still worth checking, alongside normal responsive breakpoints (mobile,
-  tablet, desktop) since Next.js doesn't have Streamlit's single-fixed-layout constraint anymore —
-  Aliff should decide how much responsive polish is worth the time versus the demo-day target.
+- **Responsive design is mandatory, not a stretch goal.** Use Tailwind's default breakpoints —
+  `sm` 640px, `md` 768px, `lg` 1024px, `xl` 1280px — and design every screen to hold up from mobile
+  through the 1280×720 projector target, not just the projector resolution. Next.js doesn't have
+  Streamlit's single-fixed-layout constraint, so there's no excuse to design for one viewport only.
 
 ## Verdict banner rules (Simulator)
 
@@ -96,10 +126,15 @@ observed real-world probability; overclaiming it is a defensibility problem, not
 | Simulator | Purchase input, before/after comparison, delta table, verdict banner, tenure alternatives. |
 | About | Methodology, factor weights, synthetic-data disclosure, limitations. |
 
-## Open questions for Aliff to tune
+## Decisions log
 
-- Exact clay-red / amber / green hex values (palette above only names the neutral/brand colours).
-- Whether the score gauge is a radial gauge, a simple bar, or something else — Master Package doesn't
-  mandate a chart type, only that band + score + six factors are all visible together.
-- How much responsive design investment is worth it given the demo-day target is a fixed projector
-  resolution.
+Resolved by Aliff (2026-08-26):
+
+- **Risk colors:** reuse Jade/Songket gold for low/moderate, one new clay red (`#B5533C`) for high —
+  see "Risk / band colors" above. Centralized in `tailwind.config.ts`, not scattered as raw hex.
+- **Charts:** hand-rolled SVG arc for the score gauge, Recharts horizontal bar for the six-factor
+  breakdown — see "Chart choices" above.
+- **Responsive design:** mandatory, all breakpoints, not just the projector resolution.
+
+No open questions remain in this file as of this pass — if a new one comes up while building, add it
+here rather than deciding silently.

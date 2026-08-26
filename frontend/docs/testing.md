@@ -87,3 +87,7 @@ read from.
   anywhere else in the codebase (this is itself a good candidate for a lint rule or a grep-based test
   once there's enough code to check).
 - No component crashes when `p_stress_12m` is `null` or when the backend is unreachable.
+- Every screen holds up at each of Tailwind's default breakpoints (`sm`/`md`/`lg`/`xl`) and at the
+  1280×720 projector target — responsive design is mandatory per `design.md`, so a component test
+  suite should include at least one assertion per screen at a narrow viewport, not just the default.
+
