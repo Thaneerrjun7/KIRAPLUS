@@ -1,0 +1,55 @@
+name: Deploy backend
+
+# Builds backend/Dockerfile, pushes to GHCR, then tells the deploy target to
+# pull and run it -- the target never clones this repo. See
+# DEPLOYMENT-CHECKLIST.md (untracked, local) for the full setup this assumes:
+# DROPLET_HOST/DROPLET_USER/DROPLET_SSH_KEY secrets, and /opt/kiraplus/deploy.sh
+# already present on the target.
+
+on:
+  push:
+    branches: [main]
+    # data/** is included because it's baked into the image too -- see
+    # backend/Dockerfile's comment on why (profile_service.py's fixture path).
+    paths: ["backend/**", "data/**"]
+
+env:
+  # GHCR requires a lowercase path -- hardcoded rather than derived from
+  # github.repository, which is "Thaneerrjun7/KIRAPLUS" (mixed case, would
+  # break the push). Update this if the repo is ever renamed/transferred.
+  IMAGE: ghcr.io/thaneerrjun7/kiraplus-backend
+
+jobs:
+  build-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - run: |
+          docker build \
+            -f backend/Dockerfile \
+            -t "${IMAGE}:${{ github.sha }}" \
+            -t "${IMAGE}:latest" \
+            .
+          docker push "${IMAGE}:${{ github.sha }}"
+          docker push "${IMAGE}:latest"
+
+  deploy:
+    needs: build-push
+    runs-on: ubuntu-latest
+    steps:
+      - uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+          script: /opt/kiraplus/deploy.sh ${{ github.sha }}

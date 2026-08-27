@@ -231,3 +231,6 @@ next-env.d.ts
 frontend/.env.local
 
 .idea
+
+# Personal deployment runbook -- never share domain/IP/paths in tracked docs
+DEPLOYMENT-CHECKLIST.md
