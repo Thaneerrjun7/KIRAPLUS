@@ -68,4 +68,11 @@ describe("ProfileForm", () => {
       })
     );
   });
+
+  it("shows each demo persona's real quote, not just their name", () => {
+    render(<ProfileForm onSave={vi.fn()} onLoadDemo={vi.fn()} />);
+    expect(
+      screen.getByText(/I always know I can pay it/i)
+    ).toBeInTheDocument();
+  });
 });
