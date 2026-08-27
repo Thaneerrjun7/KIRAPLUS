@@ -26,4 +26,11 @@ describe("VerdictBanner", () => {
     );
     expect(container.firstChild).toHaveClass("border-risk-low");
   });
+
+  it("renders a severity icon", () => {
+    const { container } = render(
+      <VerdictBanner verdict={{ level: "red", headline: "h", detail: "d" }} />
+    );
+    expect(container.querySelector("svg")).toBeInTheDocument();
+  });
 });

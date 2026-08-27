@@ -60,4 +60,15 @@ describe("WarningList", () => {
     render(<WarningList warnings={[]} />);
     expect(screen.getByText(/no warnings/i)).toBeInTheDocument();
   });
+
+  it("renders a severity icon for a red-level warning", () => {
+    const { container } = render(
+      <WarningList
+        warnings={[
+          { code: "LOW_BUFFER", level: "red", title: "t", detail: "d", lever: "" },
+        ]}
+      />
+    );
+    expect(container.querySelector("svg")).toBeInTheDocument();
+  });
 });
