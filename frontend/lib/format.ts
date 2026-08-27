@@ -8,15 +8,20 @@
 
 export function fmtRm(sen: number): string {
   // 95000 -> "RM950"
-  throw new Error("Not implemented");
+  return `RM${Math.round(sen / 100)}`;
 }
 
 export function fmtRmCents(sen: number): string {
   // 95000 -> "RM950.00"
-  throw new Error("Not implemented");
+  return `RM${(sen / 100).toFixed(2)}`;
 }
 
 export function toSen(ringgit: number): number {
   // 950.0 -> 95000, banker-safe
-  throw new Error("Not implemented");
+  const cents = ringgit * 100;
+  const floor = Math.floor(cents);
+  const diff = cents - floor;
+  if (diff < 0.5) return floor;
+  if (diff > 0.5) return floor + 1;
+  return floor % 2 === 0 ? floor : floor + 1;
 }
