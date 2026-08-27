@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { CommitmentsTable } from "@/components/CommitmentsTable";
+import { Button } from "@/components/ui/Button";
 import { loadProfile, saveProfile } from "@/lib/api";
 import type { Commitment, Profile } from "@/lib/fixtures";
 import { getStoredProfileId } from "@/lib/profileStorage";
@@ -29,8 +30,8 @@ export default function CommitmentsPage() {
 
   if (error && profile === null) {
     return (
-      <main>
-        <h1>Commitments</h1>
+      <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+        <h1 className="font-display text-3xl">Commitments</h1>
         <p role="alert">{error}</p>
       </main>
     );
@@ -38,8 +39,8 @@ export default function CommitmentsPage() {
 
   if (profile === null) {
     return (
-      <main>
-        <h1>Commitments</h1>
+      <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+        <h1 className="font-display text-3xl">Commitments</h1>
         <p>Save a profile first on the Profile page before editing commitments.</p>
       </main>
     );
@@ -62,14 +63,16 @@ export default function CommitmentsPage() {
   };
 
   return (
-    <main>
-      <h1>Commitments</h1>
-      {saved && <p role="status">Commitments saved.</p>}
-      {error && <p role="alert">{error}</p>}
-      <CommitmentsTable commitments={profile.commitments} onChange={handleChange} />
-      <button type="button" onClick={handleSave}>
+    <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+      <h1 className="font-display text-3xl">Commitments</h1>
+      {saved && <p role="status" className="mt-2">Commitments saved.</p>}
+      {error && <p role="alert" className="mt-2">{error}</p>}
+      <div className="mt-6">
+        <CommitmentsTable commitments={profile.commitments} onChange={handleChange} />
+      </div>
+      <Button onClick={handleSave} className="mt-6">
         Save changes
-      </button>
+      </Button>
     </main>
   );
 }

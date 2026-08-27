@@ -136,5 +136,20 @@ Resolved by Aliff (2026-08-26):
   breakdown — see "Chart choices" above.
 - **Responsive design:** mandatory, all breakpoints, not just the projector resolution.
 
+Resolved by Aliff (2026-08-27), whole-site redesign:
+
+- **Design system added:** shared primitives in `components/ui/` — `Button`, `Card` (hairline-
+  bordered panel with a small mono corner label), `Badge` (`[TEXT]` in mono, colored by risk),
+  `StatTile` (leader-dot label/value row). Heroicons (`@heroicons/react`) for functional icons only
+  — nav items, button icons, warning/verdict severity — never decorative.
+- **FactorBreakdown keeps both** the existing Recharts bar chart and the new ledger-line list
+  (weight/sub-score/your-figure/contribution/strength per row) — a mockup draft dropped the chart
+  in favor of the ledger lines alone, but Aliff chose to keep both rather than replace one with the
+  other. See `docs/superpowers/specs/2026-08-27-website-redesign-design.md` for the full spec.
+- **Dynamic Tailwind risk classes are safelisted:** `text-risk-*`/`border-risk-*`/`stroke-risk-*`/
+  `bg-risk-*` built via template literals (e.g. `` `text-risk-${risk}` ``) aren't resolvable by
+  Tailwind's JIT scanner on their own — `tailwind.config.ts` now has an explicit `safelist` pattern
+  covering every combination, found necessary during the redesign's pre-flight review.
+
 No open questions remain in this file as of this pass — if a new one comes up while building, add it
 here rather than deciding silently.
