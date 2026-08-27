@@ -43,7 +43,7 @@ export function SimulatorPanel({
 
   return (
     <div className="flex flex-col gap-6">
-      <Card>
+      <Card className="p-6">
         <label htmlFor="tenure-slider" className="text-sm font-medium text-navy/80">
           Tenure: {tenure} months
         </label>

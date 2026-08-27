@@ -75,8 +75,8 @@ export default function DashboardPage() {
 
   if (profile === null && error === null) {
     return (
-      <main>
-        <h1>Dashboard</h1>
+      <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+        <h1 className="font-display text-3xl">Dashboard</h1>
         <p>Save a profile first on the Profile page to see your score.</p>
       </main>
     );
@@ -84,8 +84,8 @@ export default function DashboardPage() {
 
   if (error) {
     return (
-      <main>
-        <h1>Dashboard</h1>
+      <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+        <h1 className="font-display text-3xl">Dashboard</h1>
         <p role="alert">{error}</p>
       </main>
     );
@@ -93,8 +93,8 @@ export default function DashboardPage() {
 
   if (assessment === null) {
     return (
-      <main>
-        <h1>Dashboard</h1>
+      <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+        <h1 className="font-display text-3xl">Dashboard</h1>
         <p>Loading your assessment…</p>
       </main>
     );
@@ -104,7 +104,7 @@ export default function DashboardPage() {
     <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
       <h1 className="font-display text-3xl">Dashboard</h1>
       <div className="mt-6 grid gap-6 lg:grid-cols-[320px_1fr] lg:items-start">
-        <Card label="SCORE">
+        <Card label="SCORE" className="p-6">
           <div className="flex flex-col items-center">
             <ScoreGauge score={assessment.score} band={assessment.band} />
           </div>
@@ -118,11 +118,11 @@ export default function DashboardPage() {
           features={assessment.features}
         />
       </div>
-      <Card label="WARNINGS" className="mt-6">
+      <Card label="WARNINGS" className="mt-6 p-6">
         <WarningList warnings={assessment.warnings} />
       </Card>
       {explanation && (
-        <Card label="WHAT THIS MEANS" className="mt-6">
+        <Card label="WHAT THIS MEANS" className="mt-6 p-6">
           <p className="leading-relaxed">{explanation}</p>
         </Card>
       )}

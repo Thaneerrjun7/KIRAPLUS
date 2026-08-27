@@ -62,7 +62,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      <Card label="SUMMARY">
+      <Card label="SUMMARY" className="p-6">
         <div className="flex flex-col gap-2.5">
           <StatTile label="Commitments" value={String(summary.count)} />
           <StatTile label="Monthly total" value={fmtRm(summary.monthlyTotalSen)} />
@@ -71,7 +71,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
         </div>
       </Card>
 
-      <Card label="OBLIGATIONS BREAKDOWN">
+      <Card label="OBLIGATIONS BREAKDOWN" className="p-6">
         <div className="flex flex-col gap-2.5">
           {KINDS.map((kind) => (
             <div key={kind} className="flex items-center gap-2 text-sm">
@@ -85,7 +85,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
         </div>
       </Card>
 
-      <Card label="EDIT COMMITMENTS">
+      <Card label="EDIT COMMITMENTS" className="p-6">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-xs uppercase text-navy/50">

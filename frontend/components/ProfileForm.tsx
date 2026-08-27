@@ -79,7 +79,7 @@ export function ProfileForm({ initialProfile, onSave, onLoadDemo }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-      <Card label="DEMO PERSONAS">
+      <Card label="DEMO PERSONAS" className="p-6">
         <h2 className="font-display text-lg">Load a demo persona</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           {DEMO_PERSONAS.map((persona) => (
@@ -96,7 +96,7 @@ export function ProfileForm({ initialProfile, onSave, onLoadDemo }: Props) {
         </div>
       </Card>
 
-      <Card label="YOUR PROFILE">
+      <Card label="YOUR PROFILE" className="p-6">
         <div className="flex flex-col gap-4">
           <div>
             <label htmlFor="profile-label" className={labelClasses}>

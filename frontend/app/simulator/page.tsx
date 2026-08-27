@@ -61,8 +61,8 @@ export default function SimulatorPage() {
 
   if (profile === null && error === null) {
     return (
-      <main>
-        <h1>Simulator</h1>
+      <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+        <h1 className="font-display text-3xl">Simulator</h1>
         <p>Save a profile first on the Profile page to try a purchase.</p>
       </main>
     );
@@ -70,8 +70,8 @@ export default function SimulatorPage() {
 
   if (error) {
     return (
-      <main>
-        <h1>Simulator</h1>
+      <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+        <h1 className="font-display text-3xl">Simulator</h1>
         <p role="alert">{error}</p>
       </main>
     );

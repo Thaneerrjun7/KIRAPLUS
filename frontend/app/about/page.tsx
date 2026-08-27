@@ -10,7 +10,7 @@ export default function AboutPage() {
     <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
       <h1 className="font-display text-3xl">About KIRA+</h1>
 
-      <Card label="SCORING METHODOLOGY" className="mt-6">
+      <Card label="SCORING METHODOLOGY" className="mt-6 p-6">
         <p className="text-navy/80">
           Published in full, because a score you cannot audit is a score you should not trust.
           Six factors, each scored 0-100 against a fixed anchor, then combined by weight.
@@ -54,7 +54,7 @@ band = LOW >= 70  ·  MODERATE 45-69  ·  HIGH < 45`}
         </p>
       </Card>
 
-      <Card label="SYNTHETIC DATA" className="mt-6">
+      <Card label="SYNTHETIC DATA" className="mt-6 p-6">
         <p className="text-navy/80">
           Every profile in this demo, including the four named personas, is synthetic. These
           profiles are constructed to exercise every branch of the scoring engine. They are not
@@ -63,7 +63,7 @@ band = LOW >= 70  ·  MODERATE 45-69  ·  HIGH < 45`}
         </p>
       </Card>
 
-      <Card label="LIMITATIONS" className="mt-6">
+      <Card label="LIMITATIONS" className="mt-6 p-6">
         <dl className="flex flex-col gap-5">
           <div>
             <dt className="font-display font-semibold">No real financial data</dt>

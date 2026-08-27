@@ -39,7 +39,7 @@ export function FactorBreakdown({ subscores, contributions, features }: Props) {
   );
 
   return (
-    <Card label="SIX-FACTOR BREAKDOWN">
+    <Card label="SIX-FACTOR BREAKDOWN" className="p-6">
       <div style={{ width: "100%", height: 220 }}>
         <ResponsiveContainer>
           <BarChart data={rows} layout="vertical" margin={{ left: 24 }}>
