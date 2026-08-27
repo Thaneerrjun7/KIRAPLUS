@@ -11,6 +11,11 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        display: ["var(--font-display)", "sans-serif"],
+        body: ["var(--font-body)", "serif"],
+        mono: ["var(--font-mono)", "monospace"],
+      },
       colors: {
         navy: "#0B1F2A",
         teal: "#0F5C56",

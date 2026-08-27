@@ -2,7 +2,7 @@
 // Every request/response body here is the same integer-sen JSON shape
 // documented in §1-§5 -- this file must never format currency itself.
 
-import type { Band, Profile, WarningCode } from "./fixtures";
+import type { Band, Features, Profile, Subscores, WarningCode } from "./fixtures";
 
 export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -27,9 +27,9 @@ export type Assessment = {
   score: number;
   band: Band;
   penalty: number;
-  features: Record<string, number>;
-  subscores: Record<string, number>;
-  contributions: Record<string, number>;
+  features: Features;
+  subscores: Subscores;
+  contributions: Subscores;
   warnings: Warning[];
   p_stress_12m: number | null;
   engine_version: string;
