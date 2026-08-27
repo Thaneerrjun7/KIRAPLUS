@@ -3,6 +3,10 @@
 import type { Commitment, CommitmentKind } from "@/lib/fixtures";
 import { summarizeCommitments } from "@/lib/aggregateCommitments";
 import { fmtRm, toSen } from "@/lib/format";
+import { Badge } from "./ui/Badge";
+import { Button } from "./ui/Button";
+import { Card } from "./ui/Card";
+import { StatTile } from "./ui/StatTile";
 
 type Props = {
   commitments: Commitment[];
@@ -57,120 +61,138 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
   };
 
   return (
-    <div>
-      <section>
-        <h2>Summary</h2>
-        <p>Commitments: <strong>{summary.count}</strong></p>
-        <p>Monthly total: <strong>{fmtRm(summary.monthlyTotalSen)}</strong></p>
-        <p>Outstanding total: <strong>{fmtRm(summary.outstandingTotalSen)}</strong></p>
-        <p>Next due: <strong>{summary.nextDue ?? "None"}</strong></p>
-      </section>
+    <div className="flex flex-col gap-6">
+      <Card label="SUMMARY">
+        <div className="flex flex-col gap-2.5">
+          <StatTile label="Commitments" value={String(summary.count)} />
+          <StatTile label="Monthly total" value={fmtRm(summary.monthlyTotalSen)} />
+          <StatTile label="Outstanding total" value={fmtRm(summary.outstandingTotalSen)} />
+          <StatTile label="Next due" value={summary.nextDue ?? "None"} />
+        </div>
+      </Card>
 
-      <section>
-        <h2>Obligations breakdown</h2>
-        <ul>
+      <Card label="OBLIGATIONS BREAKDOWN">
+        <div className="flex flex-col gap-2.5">
           {KINDS.map((kind) => (
-            <li key={kind}>
-              {kind}: {summary.byKind[kind].count} commitments,{" "}
-              {fmtRm(summary.byKind[kind].monthlyTotalSen)}/month
-            </li>
+            <div key={kind} className="flex items-center gap-2 text-sm">
+              <Badge>{kind.toUpperCase()}</Badge>
+              <span className="text-navy/70">
+                {summary.byKind[kind].count} commitments,{" "}
+                {fmtRm(summary.byKind[kind].monthlyTotalSen)}/month
+              </span>
+            </div>
           ))}
-        </ul>
-      </section>
+        </div>
+      </Card>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Label</th>
-            <th>Provider</th>
-            <th>Kind</th>
-            <th>Monthly (RM)</th>
-            <th>Outstanding (RM)</th>
-            <th>Months left</th>
-            <th>Next due</th>
-            <th />
-          </tr>
-        </thead>
-        <tbody>
-          {commitments.length === 0 && (
-            <tr>
-              <td colSpan={8}>No commitments yet.</td>
+      <Card label="EDIT COMMITMENTS">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-xs uppercase text-navy/50">
+              <th className="pb-2">Label</th>
+              <th className="pb-2">Provider</th>
+              <th className="pb-2">Kind</th>
+              <th className="pb-2">Monthly (RM)</th>
+              <th className="pb-2">Outstanding (RM)</th>
+              <th className="pb-2">Months left</th>
+              <th className="pb-2">Next due</th>
+              <th className="pb-2" />
             </tr>
-          )}
-          {commitments.map((commitment, index) => (
-            <tr key={commitment.commitment_id}>
-              <td>
-                <input
-                  aria-label={`Label ${index + 1}`}
-                  value={commitment.label}
-                  onChange={(e) => updateField(index, "label", e.target.value)}
-                />
-              </td>
-              <td>
-                <input
-                  aria-label={`Provider ${index + 1}`}
-                  value={commitment.provider}
-                  onChange={(e) => updateField(index, "provider", e.target.value)}
-                />
-              </td>
-              <td>
-                <select
-                  aria-label={`Kind ${index + 1}`}
-                  value={commitment.kind}
-                  onChange={(e) => updateField(index, "kind", e.target.value)}
-                >
-                  {KINDS.map((kind) => (
-                    <option key={kind} value={kind}>
-                      {kind}
-                    </option>
-                  ))}
-                </select>
-              </td>
-              <td>
-                <input
-                  aria-label={`Monthly ${index + 1}`}
-                  type="number"
-                  value={commitment.monthly_sen / 100}
-                  onChange={(e) => updateField(index, "monthly_sen", e.target.value)}
-                />
-              </td>
-              <td>
-                <input
-                  aria-label={`Outstanding ${index + 1}`}
-                  type="number"
-                  value={commitment.outstanding_sen / 100}
-                  onChange={(e) => updateField(index, "outstanding_sen", e.target.value)}
-                />
-              </td>
-              <td>
-                <input
-                  aria-label={`Months left ${index + 1}`}
-                  type="number"
-                  value={commitment.months_left}
-                  onChange={(e) => updateField(index, "months_left", e.target.value)}
-                />
-              </td>
-              <td>
-                <input
-                  aria-label={`Next due ${index + 1}`}
-                  type="date"
-                  value={commitment.next_due ?? ""}
-                  onChange={(e) => updateField(index, "next_due", e.target.value)}
-                />
-              </td>
-              <td>
-                <button type="button" onClick={() => removeRow(index)}>
-                  Remove
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {commitments.length === 0 && (
+              <tr>
+                <td colSpan={8} className="py-4 text-navy/60">
+                  No commitments yet.
+                </td>
+              </tr>
+            )}
+            {commitments.map((commitment, index) => (
+              <tr key={commitment.commitment_id} className="border-t border-navy/10">
+                <td className="py-2">
+                  <input
+                    aria-label={`Label ${index + 1}`}
+                    value={commitment.label}
+                    onChange={(e) => updateField(index, "label", e.target.value)}
+                    className="w-full border border-navy/15 px-2 py-1"
+                  />
+                </td>
+                <td className="py-2">
+                  <input
+                    aria-label={`Provider ${index + 1}`}
+                    value={commitment.provider}
+                    onChange={(e) => updateField(index, "provider", e.target.value)}
+                    className="w-full border border-navy/15 px-2 py-1"
+                  />
+                </td>
+                <td className="py-2">
+                  <select
+                    aria-label={`Kind ${index + 1}`}
+                    value={commitment.kind}
+                    onChange={(e) => updateField(index, "kind", e.target.value)}
+                    className="border border-navy/15 px-2 py-1"
+                  >
+                    {KINDS.map((kind) => (
+                      <option key={kind} value={kind}>
+                        {kind}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+                <td className="py-2">
+                  <input
+                    aria-label={`Monthly ${index + 1}`}
+                    type="number"
+                    value={commitment.monthly_sen / 100}
+                    onChange={(e) => updateField(index, "monthly_sen", e.target.value)}
+                    className="w-24 border border-navy/15 px-2 py-1"
+                  />
+                </td>
+                <td className="py-2">
+                  <input
+                    aria-label={`Outstanding ${index + 1}`}
+                    type="number"
+                    value={commitment.outstanding_sen / 100}
+                    onChange={(e) => updateField(index, "outstanding_sen", e.target.value)}
+                    className="w-24 border border-navy/15 px-2 py-1"
+                  />
+                </td>
+                <td className="py-2">
+                  <input
+                    aria-label={`Months left ${index + 1}`}
+                    type="number"
+                    value={commitment.months_left}
+                    onChange={(e) => updateField(index, "months_left", e.target.value)}
+                    className="w-20 border border-navy/15 px-2 py-1"
+                  />
+                </td>
+                <td className="py-2">
+                  <input
+                    aria-label={`Next due ${index + 1}`}
+                    type="date"
+                    value={commitment.next_due ?? ""}
+                    onChange={(e) => updateField(index, "next_due", e.target.value)}
+                    className="border border-navy/15 px-2 py-1"
+                  />
+                </td>
+                <td className="py-2">
+                  <button
+                    type="button"
+                    onClick={() => removeRow(index)}
+                    className="text-xs text-risk-high hover:underline"
+                  >
+                    Remove
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
-      <button type="button" onClick={addRow}>
-        Add commitment
-      </button>
+        <Button variant="secondary" onClick={addRow} className="mt-4">
+          Add commitment
+        </Button>
+      </Card>
     </div>
   );
 }

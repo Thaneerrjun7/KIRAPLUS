@@ -18,8 +18,10 @@ describe("CommitmentsTable", () => {
 
   it("renders the obligations breakdown by kind", () => {
     render(<CommitmentsTable commitments={AISYAH.profile.commitments} onChange={vi.fn()} />);
-    expect(screen.getByText(/bnpl: 2 commitments/i)).toBeInTheDocument();
-    expect(screen.getByText(/loan: 1 commitments/i)).toBeInTheDocument();
+    expect(screen.getByText("[BNPL]")).toBeInTheDocument();
+    expect(screen.getByText(/2 commitments, RM250\/month/i)).toBeInTheDocument();
+    expect(screen.getByText("[LOAN]")).toBeInTheDocument();
+    expect(screen.getByText(/1 commitments, RM100\/month/i)).toBeInTheDocument();
   });
 
   it("editing a commitment's monthly amount calls onChange with the sen-converted value", () => {
