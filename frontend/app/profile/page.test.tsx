@@ -67,4 +67,27 @@ describe("ProfilePage", () => {
     expect(window.localStorage.getItem("kira_profile_id")).toBe("99");
     expect(await screen.findByRole("status")).toHaveTextContent(/saved/i);
   });
+
+  it("shows an error instead of crashing when the stored profile_id no longer exists", async () => {
+    window.localStorage.setItem("kira_profile_id", "1");
+    loadProfile.mockRejectedValue(new Error("Profile 1 not found."));
+
+    render(<ProfilePage />);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Profile 1 not found.");
+  });
+
+  it("shows an error instead of crashing when saving fails", async () => {
+    saveProfile.mockRejectedValue(new Error("Request failed"));
+    render(<ProfilePage />);
+
+    fireEvent.change(screen.getByLabelText(/income/i), { target: { value: "4500" } });
+    fireEvent.change(screen.getByLabelText(/fixed expenses/i), { target: { value: "1984" } });
+    fireEvent.change(screen.getByLabelText(/variable expenses/i), { target: { value: "1216" } });
+    fireEvent.change(screen.getByLabelText(/savings/i), { target: { value: "2250" } });
+    fireEvent.change(screen.getByLabelText(/loan/i), { target: { value: "100" } });
+    fireEvent.click(screen.getByRole("button", { name: /save/i }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Request failed");
+  });
 });
