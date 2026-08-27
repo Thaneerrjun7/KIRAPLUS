@@ -13,8 +13,11 @@ this file only adds what's specific to working in this directory.
 - `utils/` — pure Python, zero third-party imports. Arjun.
 - `models/` — synthetic data generation, Monte-Carlo labels, training. Arjun.
 - `database/` — `schema.sql` + `init_db.py`, INTEGER-sen columns. Aliff. Already working, not a stub.
-- `tests/` — one stub file per test group, T-01…T-12. (T-13, the unit-invariance test §0 refers to,
-  has no stub file yet — a pre-existing gap from the original scaffold, not part of any later change.)
+- `tests/` — one stub file per test group, T-01…T-12 (Arjun's scoring/warning/simulation/LLM domain).
+  (T-13, the unit-invariance test §0 refers to, has no stub file yet — a pre-existing gap from the
+  original scaffold, not part of any later change.) `test_profile_service.py` and `test_routers.py`
+  cover Aliff's slice (`services/profile_service.py`, `app/routers/*.py`) — §2 and §9 respectively —
+  and aren't part of the T-01…T-13 numbering, which is scoring-domain only.
 
 ## Rules specific to this half of the repo
 
