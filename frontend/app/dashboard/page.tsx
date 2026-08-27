@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { FactorBreakdown } from "@/components/FactorBreakdown";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { WarningList } from "@/components/WarningList";
+import { Card } from "@/components/ui/Card";
 import { assess, explain, loadProfile, type Assessment } from "@/lib/api";
 import { rankFactorsByLostContribution } from "@/lib/factorConfig";
 import type { Profile } from "@/lib/fixtures";
@@ -100,17 +101,31 @@ export default function DashboardPage() {
   }
 
   return (
-    <main>
-      <h1>Dashboard</h1>
-      <ScoreGauge score={assessment.score} band={assessment.band} />
-      <FactorBreakdown
-        subscores={assessment.subscores}
-        contributions={assessment.contributions}
-        features={assessment.features}
-      />
-      <WarningList warnings={assessment.warnings} />
-      {explanation && <p>{explanation}</p>}
-      <p className="text-sm text-navy/70">{assessment.disclaimer}</p>
+    <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+      <h1 className="font-display text-3xl">Dashboard</h1>
+      <div className="mt-6 grid gap-6 lg:grid-cols-[320px_1fr] lg:items-start">
+        <Card label="SCORE">
+          <div className="flex flex-col items-center">
+            <ScoreGauge score={assessment.score} band={assessment.band} />
+          </div>
+          <p className="mt-5 border-t border-dashed border-navy/15 pt-3.5 text-xs leading-relaxed text-navy/60">
+            {assessment.disclaimer}
+          </p>
+        </Card>
+        <FactorBreakdown
+          subscores={assessment.subscores}
+          contributions={assessment.contributions}
+          features={assessment.features}
+        />
+      </div>
+      <Card label="WARNINGS" className="mt-6">
+        <WarningList warnings={assessment.warnings} />
+      </Card>
+      {explanation && (
+        <Card label="WHAT THIS MEANS" className="mt-6">
+          <p className="leading-relaxed">{explanation}</p>
+        </Card>
+      )}
     </main>
   );
 }

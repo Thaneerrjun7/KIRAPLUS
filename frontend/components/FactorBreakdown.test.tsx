@@ -25,9 +25,29 @@ describe("FactorBreakdown", () => {
     );
 
     expect(screen.getByText("Debt burden")).toBeInTheDocument();
-    expect(screen.getByText("93.06")).toBeInTheDocument();
-    expect(screen.getByText("25")).toBeInTheDocument();
-    expect(screen.getByText("23.26")).toBeInTheDocument();
+    expect(screen.getByText(/w25/)).toBeInTheDocument();
+    expect(screen.getByText(/sub 93\.06/)).toBeInTheDocument();
+    expect(screen.getByText(/fig 0\.0778/)).toBeInTheDocument();
+    expect(screen.getByText("+23.26")).toBeInTheDocument();
+  });
+
+  it("renders each factor's strength as a badge", () => {
+    render(
+      <FactorBreakdown
+        subscores={AISYAH.expected.subscores}
+        contributions={{
+          debt_burden: 23.26,
+          bnpl_exposure: 16.05,
+          disposable_income: 14.07,
+          emergency_buffer: 1.58,
+          repayment_capacity: 12.0,
+          savings_resilience: 1.33,
+        }}
+        features={AISYAH.expected.features}
+      />
+    );
+    expect(screen.getAllByText("[STRONG]").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("[CRITICAL]").length).toBeGreaterThan(0);
   });
 
   it("visually distinguishes the two weakest factors by lost contribution", () => {

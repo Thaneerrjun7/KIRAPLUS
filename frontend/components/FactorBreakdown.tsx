@@ -1,15 +1,25 @@
 // Six-factor breakdown: sub-score, weight, contribution, the user's own raw figure per factor.
-// The semantic list below is the correctness-bearing element; the Recharts horizontal bar
-// (design.md's "Chart choices") is a supplementary at-a-glance visual alongside it.
+// The ledger-line list below is the correctness-bearing element; the Recharts horizontal bar
+// (design.md's "Chart choices") is kept alongside it as a quick visual comparison (2026-08-27
+// decision: keep both rather than dropping the chart in favor of the ledger lines alone).
 
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, XAxis, YAxis } from "recharts";
 import type { Features, Subscores } from "@/lib/fixtures";
-import { classifyStrength, FACTORS } from "@/lib/factorConfig";
+import { classifyStrength, FACTORS, type Strength } from "@/lib/factorConfig";
+import { Badge } from "./ui/Badge";
+import { Card } from "./ui/Card";
 
 type Props = {
   subscores: Subscores;
   contributions: Record<string, number>;
   features: Features;
+};
+
+const STRENGTH_RISK: Record<Strength, "high" | "moderate" | "neutral" | "low"> = {
+  Critical: "high",
+  Weak: "moderate",
+  Adequate: "neutral",
+  Strong: "low",
 };
 
 export function FactorBreakdown({ subscores, contributions, features }: Props) {
@@ -29,7 +39,7 @@ export function FactorBreakdown({ subscores, contributions, features }: Props) {
   );
 
   return (
-    <div>
+    <Card label="SIX-FACTOR BREAKDOWN">
       <div style={{ width: "100%", height: 220 }}>
         <ResponsiveContainer>
           <BarChart data={rows} layout="vertical" margin={{ left: 24 }}>
@@ -41,35 +51,40 @@ export function FactorBreakdown({ subscores, contributions, features }: Props) {
         </ResponsiveContainer>
       </div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Factor</th>
-            <th>Sub-score</th>
-            <th>Weight</th>
-            <th>Contribution</th>
-            <th>Your figure</th>
-            <th>Strength</th>
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr
+      <div className="mt-4 flex flex-col gap-2.5">
+        <div className="flex items-baseline font-mono text-[11px] text-navy/40">
+          <span className="flex-1">FACTOR &middot; WEIGHT &middot; SUB-SCORE &middot; YOUR FIGURE</span>
+          <span className="w-20 text-right">CONTRIB.</span>
+          <span className="w-24 text-right">STRENGTH</span>
+        </div>
+        {rows.map((row) => {
+          const strength = classifyStrength(row.subscore);
+          const weakest = weakestKeys.has(row.key);
+          return (
+            <div
               key={row.key}
               data-testid={`factor-${row.key}`}
-              data-weakest={weakestKeys.has(row.key)}
-              className={weakestKeys.has(row.key) ? "bg-risk-high/10 font-semibold" : undefined}
+              data-weakest={weakest}
+              className={`flex items-baseline gap-1.5 ${weakest ? "bg-risk-high/10 font-semibold" : ""}`}
             >
-              <td>{row.label}</td>
-              <td>{row.subscore.toFixed(2)}</td>
-              <td>{row.weight}</td>
-              <td>{row.contribution.toFixed(2)}</td>
-              <td>{row.rawValue}</td>
-              <td>{classifyStrength(row.subscore)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+              <span className="text-sm">
+                <span>{row.label}</span>{" "}
+                <span className="font-mono text-[11px] text-navy/45">
+                  w{row.weight} &middot; sub {row.subscore.toFixed(2)} &middot; fig {row.rawValue}
+                </span>
+              </span>
+              <span className="mb-0.5 flex-1 border-b border-dotted border-navy/30" />
+              <span className="w-20 text-right font-mono text-sm">
+                {row.contribution >= 0 ? "+" : ""}
+                {row.contribution.toFixed(2)}
+              </span>
+              <span className="w-24 text-right">
+                <Badge risk={STRENGTH_RISK[strength]}>{strength.toUpperCase()}</Badge>
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </Card>
   );
 }
