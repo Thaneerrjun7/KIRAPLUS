@@ -223,6 +223,9 @@ backend/database/kira.db
 # Node / Next.js (frontend/)
 node_modules/
 .next/
+*.tsbuildinfo
+frontend/playwright-report/
+frontend/test-results/
 out/
 next-env.d.ts
 frontend/.env.local

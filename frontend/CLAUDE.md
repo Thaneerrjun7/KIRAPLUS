@@ -3,6 +3,19 @@
 Next.js (App Router, TypeScript). Presentation only. See the root `CLAUDE.md` for the frozen-contract
 and unit rules in full; this file only adds what's specific to working in this directory.
 
+## Local docs
+
+`frontend/docs/` holds this side's own planning docs — separate from the root `docs/` (the shared
+contract, the master package, cross-team handoff), which stays the master for anything both sides
+need. Read before building anything:
+
+- `frontend/docs/architecture.md` — directory layout, data flow, state management, one section per
+  MVP screen with its backend calls and acceptance criteria.
+- `frontend/docs/design.md` — brand system, UI rules, verdict-banner and warning-copy wording,
+  screen content spec. Aliff tunes this one most.
+- `frontend/docs/testing.md` — the AI-first TDD plan: what to test at each layer, against which
+  fixtures, before writing the component it tests.
+
 ## Scope
 
 This directory owns the five MVP pages (`app/profile`, `app/commitments`, `app/dashboard`,
@@ -34,5 +47,22 @@ so nothing here needs to change once those stop raising `NotImplementedError`.
 
 ```bash
 npm install
-npm run dev   # :3000, calls http://localhost:8000
+npm run dev        # :3000, calls http://localhost:8000
+npm test            # Vitest, once
+npm run test:watch  # Vitest, watch mode
+npm run test:e2e    # Playwright (needs `npx playwright install` once)
 ```
+
+Write the test in `lib/` (or eventually `components/`) against `lib/fixtures.ts` before writing the
+implementation — same TDD-first rule `backend/CLAUDE.md` states for the Python side. See
+`frontend/docs/testing.md` for the full test pyramid and what's already wired up.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
