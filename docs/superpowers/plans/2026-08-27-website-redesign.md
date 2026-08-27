@@ -22,6 +22,72 @@
 
 ---
 
+### Task 0: Fix Tailwind safelist for dynamic `risk-*` color classes
+
+**Why this task exists (found during pre-flight, not in the original spec):** every existing component that colors itself by risk band (`ScoreGauge`, `WarningList`, `VerdictBanner`, `FactorBreakdown`) builds the Tailwind class name at runtime with a template literal, e.g. `` `text-risk-${risk}` ``. Tailwind's JIT scanner extracts candidate class names from the literal text of source files — it cannot resolve `${risk}` — so a dynamically-built class is only ever generated if its exact fully-formed string ALSO appears literally somewhere Tailwind scans (a test's `toHaveClass("stroke-risk-moderate")` string, for example). This is fragile and already broken today: verified against a real dev build that `.text-risk-low`, `.text-risk-moderate`, `.text-risk-high`, `.border-risk-moderate`, `.bg-risk-low/10`, and `.bg-risk-moderate/10` are **not** in the generated stylesheet at all, despite being used. This plan's new `Badge` (Task 3) and the icon colors added in Task 9 make this much worse — Badge alone needs all three `text-risk-*` variants. RTL/jsdom tests cannot catch this class of bug (they check the `className` string, never real generated CSS), which is why it went unnoticed. Fixing it now, before any task that depends on correct risk coloring.
+
+**Files:**
+- Modify: `frontend/tailwind.config.ts`
+
+**Interfaces:**
+- Produces: every `text-risk-*`, `border-risk-*`, `stroke-risk-*`, and `bg-risk-*` (with `/10` or `/15` opacity) class reliably generated, regardless of which file happens to reference it literally. All later tasks depend on this.
+
+- [ ] **Step 1: Add a safelist covering every risk-color combination in use**
+
+Open `frontend/tailwind.config.ts`. It currently ends with:
+
+```ts
+  plugins: [],
+};
+
+export default config;
+```
+
+Add a `safelist` key as a sibling of `content` and `theme` (before `plugins`):
+
+```ts
+  safelist: [
+    { pattern: /^(text|border|stroke)-risk-(low|moderate|high)$/ },
+    { pattern: /^bg-risk-(low|moderate|high)(\/(10|15))?$/ },
+  ],
+```
+
+- [ ] **Step 2: Verify the classes are actually generated**
+
+Run: `cd frontend && npm run dev -- --port 8713 &` then, once "Ready" appears in the output:
+
+```bash
+curl -s http://localhost:8713/dashboard > /tmp/task0-check.html
+CSS_PATH=$(grep -oP '(?<=href=")[^"]*\.css[^"]*' /tmp/task0-check.html | head -1)
+curl -s "http://localhost:8713$CSS_PATH" > /tmp/task0-check.css
+grep -c "\.text-risk-moderate" /tmp/task0-check.css
+grep -c "\.border-risk-moderate" /tmp/task0-check.css
+grep -c "\.bg-risk-moderate" /tmp/task0-check.css
+```
+
+Expected: each `grep -c` prints `1` or more (not `0`). Then stop the dev server (`kill` the backgrounded PID) and delete `/tmp/task0-check.html` `/tmp/task0-check.css`.
+
+- [ ] **Step 3: Run the full test suite, lint, typecheck**
+
+Run: `cd frontend && npm test && npm run lint && npx tsc --noEmit`
+Expected: all clean (this change adds no new component behavior, only ensures existing/planned dynamic classes have real CSS backing).
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add frontend/tailwind.config.ts
+git commit -m "fix(frontend): safelist dynamic risk-* Tailwind classes
+
+Template-literal classes like text-risk-\${risk} are invisible to
+Tailwind's JIT scanner, so several risk-colored elements (ScoreGauge's
+band label, WarningList/VerdictBanner icons and borders) were never
+actually generating CSS -- confirmed against a real build. RTL/jsdom
+tests never caught this since they check the className string, not
+real generated CSS."
+```
+
+---
+
 ### Task 1: `Button` primitive
 
 **Files:**
@@ -941,19 +1007,7 @@ export function ProfileForm({ initialProfile, onSave, onLoadDemo }: Props) {
 }
 ```
 
-Note: `Button`'s `type="submit"` needs to pass through — check `Button`'s `ButtonAsButton` type already extends `ButtonHTMLAttributes<HTMLButtonElement>`, which includes `type`, and the implementation spreads `...buttonRest` onto the `<button>`, which currently also hardcodes `type="button"` before the spread — reorder so a passed `type` prop wins:
-
-```tsx
-// in frontend/components/ui/Button.tsx, Step 3 of Task 1 — adjust the button branch to:
-  const { href: _href, ...buttonRest } = rest as ButtonAsButton;
-  return (
-    <button type="button" {...buttonRest} className={classes}>
-      {children}
-    </button>
-  );
-```
-
-(`{...buttonRest}` after `type="button"` but before `className` lets an explicit `type="submit"` override the default, while `className` stays the computed one regardless of what's spread.)
+Note: `Button`'s `type="submit"` already passes through correctly as written in Task 1 — `{...buttonRest}` is spread after the literal `type="button"`, so a passed `type="submit"` in `buttonRest` overrides the default. No change to `Button.tsx` is needed for this task.
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -984,23 +1038,28 @@ git commit -m "feat(frontend): restyle the Profile page with Card grouping and p
 - Consumes: `Card` (Task 2), `StatTile` (Task 4), `Badge` (Task 3).
 - Produces: same `CommitmentsTable` props (`commitments`, `onChange`) — unchanged.
 
-- [ ] **Step 1: Update the existing test assertions that target the old `<strong>`-wrapped summary text**
+- [ ] **Step 1: Update the existing test assertions**
 
-The existing test `"renders the aggregate card matching the sum of Aisyah's commitments"` uses `screen.getByText("RM350")` and `screen.getByText("RM9100")` against `<strong>` tags — `StatTile` already isolates the value into its own `<span>`, so these assertions keep passing unchanged. Add one new test for the kind `Badge`:
+The existing test `"renders the aggregate card matching the sum of Aisyah's commitments"` uses `screen.getByText("RM350")` and `screen.getByText("RM9100")` against `<strong>` tags — `StatTile` already isolates the value into its own `<span>`, so these assertions keep passing unchanged.
+
+The existing test `"renders the obligations breakdown by kind"` currently asserts `screen.getByText(/bnpl: 2 commitments/i)` and `screen.getByText(/loan: 1 commitments/i)` as one continuous phrase per kind. The new markup splits the kind into its own `Badge` (rendering `[BNPL]`) from the count/total text (a separate `<span>`) — these can no longer match as one phrase. Replace this test's body:
 
 ```tsx
-// add to frontend/components/CommitmentsTable.test.tsx, inside the existing describe block
-it("renders each commitment's kind as a badge", () => {
+// replace the body of "renders the obligations breakdown by kind" in
+// frontend/components/CommitmentsTable.test.tsx
+it("renders the obligations breakdown by kind", () => {
   render(<CommitmentsTable commitments={AISYAH.profile.commitments} onChange={vi.fn()} />);
-  expect(screen.getAllByText("[BNPL]").length).toBeGreaterThan(0);
+  expect(screen.getByText("[BNPL]")).toBeInTheDocument();
+  expect(screen.getByText(/2 commitments, RM250\/month/i)).toBeInTheDocument();
   expect(screen.getByText("[LOAN]")).toBeInTheDocument();
+  expect(screen.getByText(/1 commitments, RM100\/month/i)).toBeInTheDocument();
 });
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd frontend && npm test -- components/CommitmentsTable.test.tsx`
-Expected: the new test FAILS (no `[BNPL]`/`[LOAN]` text yet); existing tests still pass against current markup.
+Expected: the updated `"renders the obligations breakdown by kind"` test FAILS (no `[BNPL]`/`[LOAN]` badge text exists yet against the current markup); other existing tests still pass.
 
 - [ ] **Step 3: Write the implementation**
 
@@ -1377,9 +1436,38 @@ git commit -m "feat(frontend): add severity icons to WarningList and VerdictBann
 - Consumes: `Card` (Task 2), `Badge` (Task 3), keeps existing Recharts bar chart (per the "keep both" decision — do not remove `recharts` usage).
 - Produces: same `FactorBreakdown` props — unchanged. Same `DashboardPage` behavior — unchanged.
 
-- [ ] **Step 1: Update the existing test's Strength assertion**
+- [ ] **Step 1: Update the existing tests for the new ledger-line markup**
 
-The current test only checks `data-weakest` and the `bg-risk-high/10` class on the row. Add one assertion for the new `Badge` rendering:
+The ledger-line redesign combines weight, sub-score, and the raw feature figure into one small annotation span per row (e.g. `w25 · sub 93.06 · fig 0.0778`) rather than separate table cells, and prefixes contribution with its sign (`+23.26`). This breaks two of the existing test's exact-text assertions (`screen.getByText("93.06")`, `screen.getByText("25")`, `screen.getByText("23.26")` would no longer match anything, since those numbers are no longer isolated in their own elements). Replace the whole `"renders all six factors with their subscore, weight, and contribution"` test body:
+
+```tsx
+// replace the body of "renders all six factors with their subscore, weight, and contribution"
+// in frontend/components/FactorBreakdown.test.tsx
+it("renders all six factors with their subscore, weight, and contribution", () => {
+  render(
+    <FactorBreakdown
+      subscores={AISYAH.expected.subscores}
+      contributions={{
+        debt_burden: 23.26,
+        bnpl_exposure: 16.05,
+        disposable_income: 14.07,
+        emergency_buffer: 1.58,
+        repayment_capacity: 12.0,
+        savings_resilience: 1.33,
+      }}
+      features={AISYAH.expected.features}
+    />
+  );
+
+  expect(screen.getByText("Debt burden")).toBeInTheDocument();
+  expect(screen.getByText(/w25/)).toBeInTheDocument();
+  expect(screen.getByText(/sub 93\.06/)).toBeInTheDocument();
+  expect(screen.getByText(/fig 0\.0778/)).toBeInTheDocument();
+  expect(screen.getByText("+23.26")).toBeInTheDocument();
+});
+```
+
+Then add one new test for the `Badge` rendering:
 
 ```tsx
 // add to frontend/components/FactorBreakdown.test.tsx, inside the existing describe block
@@ -1406,7 +1494,7 @@ it("renders each factor's strength as a badge", () => {
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `cd frontend && npm test -- components/FactorBreakdown.test.tsx`
-Expected: new test FAILS (no `[STRONG]`/`[CRITICAL]` text yet — current version renders `Strong`/`Critical` as plain `<td>` text, not bracketed).
+Expected: both the rewritten test and the new badge test FAIL against the current table-based markup (no combined `w25 · sub 93.06 · fig 0.0778` annotation, no `+23.26` sign, no `[STRONG]`/`[CRITICAL]` bracketed text exist yet).
 
 - [ ] **Step 3: Write the implementation**
 
@@ -1469,7 +1557,7 @@ export function FactorBreakdown({ subscores, contributions, features }: Props) {
 
       <div className="mt-4 flex flex-col gap-2.5">
         <div className="flex items-baseline font-mono text-[11px] text-navy/40">
-          <span className="flex-1">FACTOR &middot; WEIGHT &middot; SUB-SCORE</span>
+          <span className="flex-1">FACTOR &middot; WEIGHT &middot; SUB-SCORE &middot; YOUR FIGURE</span>
           <span className="w-20 text-right">CONTRIB.</span>
           <span className="w-24 text-right">STRENGTH</span>
         </div>
@@ -1484,9 +1572,9 @@ export function FactorBreakdown({ subscores, contributions, features }: Props) {
               className={`flex items-baseline gap-1.5 ${weakest ? "bg-risk-high/10 font-semibold" : ""}`}
             >
               <span className="text-sm">
-                {row.label}{" "}
+                <span>{row.label}</span>{" "}
                 <span className="font-mono text-[11px] text-navy/45">
-                  w{row.weight} &middot; sub {row.subscore.toFixed(2)}
+                  w{row.weight} &middot; sub {row.subscore.toFixed(2)} &middot; fig {row.rawValue}
                 </span>
               </span>
               <span className="mb-0.5 flex-1 border-b border-dotted border-navy/30" />

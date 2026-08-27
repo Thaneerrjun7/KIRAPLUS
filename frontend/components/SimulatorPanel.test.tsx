@@ -101,6 +101,10 @@ describe("SimulatorPanel", () => {
         bufferBeforeSen={95000}
       />
     );
+    // Scoped to the Alternatives section's wrapping element, not the whole container --
+    // the tenure slider's own label ("Tenure: 12 months") lives outside this section and would
+    // make a full-container `not.toContain("12 months")` check spuriously fail on the substring
+    // it contains, regardless of whether 12 months is actually listed as an alternative.
     const alternatives = getByRole("heading", { name: "Alternatives" }).parentElement!;
     expect(alternatives.textContent).toContain("6 months");
     expect(alternatives.textContent).toContain("score 39");
@@ -108,7 +112,6 @@ describe("SimulatorPanel", () => {
     expect(alternatives.textContent).toContain("score 59");
     expect(alternatives.textContent).toContain("24 months");
     expect(alternatives.textContent).toContain("score 62");
-    // the current tenure (12) shouldn't also appear as a suggested "alternative" entry
     expect(alternatives.textContent).not.toContain("12 months");
   });
 });

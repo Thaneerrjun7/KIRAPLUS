@@ -6,6 +6,8 @@ import type { GridEntry } from "@/lib/api";
 import type { Band } from "@/lib/fixtures";
 import { fmtRm } from "@/lib/format";
 import { computeVerdict } from "@/lib/verdict";
+import { Card } from "./ui/Card";
+import { StatTile } from "./ui/StatTile";
 import { VerdictBanner } from "./VerdictBanner";
 
 const ALTERNATIVE_TENURES = [6, 12, 18, 24];
@@ -37,69 +39,67 @@ export function SimulatorPanel({
     monthlySen: current.monthly_sen,
   });
 
-  const alternatives = ALTERNATIVE_TENURES.filter((t) => t !== tenure).map(
-    (t) => grid[t - 1]
-  );
+  const alternatives = ALTERNATIVE_TENURES.filter((t) => t !== tenure).map((t) => grid[t - 1]);
 
   return (
-    <div>
-      <label htmlFor="tenure-slider">Tenure: {tenure} months</label>
-      <input
-        id="tenure-slider"
-        role="slider"
-        type="range"
-        min={1}
-        max={36}
-        value={tenure}
-        onChange={(e) => onTenureChange(Number(e.target.value))}
-      />
+    <div className="flex flex-col gap-6">
+      <Card className="p-6">
+        <label htmlFor="tenure-slider" className="text-sm font-medium text-navy/80">
+          Tenure: {tenure} months
+        </label>
+        <input
+          id="tenure-slider"
+          role="slider"
+          type="range"
+          min={1}
+          max={36}
+          value={tenure}
+          onChange={(e) => onTenureChange(Number(e.target.value))}
+          className="mt-2 w-full"
+        />
 
-      <table>
-        <thead>
-          <tr>
-            <th />
-            <th>Before</th>
-            <th>After</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th>Monthly payment</th>
-            <td />
-            <td>{fmtRm(current.monthly_sen)}</td>
-          </tr>
-          <tr>
-            <th>Score</th>
-            <td>{scoreBefore}</td>
-            <td>{current.score}</td>
-          </tr>
-          <tr>
-            <th>Band</th>
-            <td>{bandBefore}</td>
-            <td>{current.band}</td>
-          </tr>
-          <tr>
-            <th>Buffer</th>
-            <td>{fmtRm(bufferBeforeSen)}</td>
-            <td>{fmtRm(bufferAfterSen)}</td>
-          </tr>
-        </tbody>
-      </table>
+        <div className="mt-5 grid grid-cols-2 gap-x-8 gap-y-3">
+          <div>
+            <p className="font-mono text-[11px] uppercase text-navy/40">Before</p>
+            <div className="mt-2 flex flex-col gap-2">
+              <StatTile label="Score" value={String(scoreBefore)} />
+              <StatTile label="Band" value={bandBefore} />
+              <StatTile label="Buffer" value={fmtRm(bufferBeforeSen)} />
+            </div>
+          </div>
+          <div>
+            <p className="font-mono text-[11px] uppercase text-navy/40">After</p>
+            <div className="mt-2 flex flex-col gap-2">
+              <StatTile label="Monthly payment" value={fmtRm(current.monthly_sen)} />
+              <StatTile label="Score" value={String(current.score)} />
+              <StatTile label="Band" value={current.band} />
+              <StatTile
+                label="Buffer"
+                value={fmtRm(bufferAfterSen)}
+                valueClassName={bufferAfterSen < bufferBeforeSen ? "text-risk-high" : ""}
+              />
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <VerdictBanner verdict={verdict} />
 
-      <section>
-        <h3>Alternatives</h3>
-        <ul>
+      <div>
+        <h3 className="font-display text-lg">Alternatives</h3>
+        <div className="mt-3 grid gap-3 md:grid-cols-3">
           {alternatives.map((alt) => (
-            <li key={alt.tenure_months}>
-              {alt.tenure_months} months: {fmtRm(alt.monthly_sen)}/month, score {alt.score} (
-              {alt.delta >= 0 ? "+" : ""}
-              {alt.delta})
-            </li>
+            <Card key={alt.tenure_months} className="p-4">
+              <p className="font-mono text-sm">{alt.tenure_months} months</p>
+              <p className="mt-1 text-sm text-navy/70">{fmtRm(alt.monthly_sen)}/month</p>
+              <p className="mt-1 font-mono text-sm">
+                score {alt.score} ({alt.delta >= 0 ? "+" : ""}
+                {alt.delta})
+              </p>
+            </Card>
           ))}
-        </ul>
-      </section>
+        </div>
+      </div>
     </div>
   );
 }

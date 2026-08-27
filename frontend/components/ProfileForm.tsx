@@ -2,16 +2,19 @@
 
 import { useState } from "react";
 import type { Profile } from "@/lib/fixtures";
+import { AISYAH, DANIEL, FARAH, WEIJIAN } from "@/lib/fixtures";
 import { toSen } from "@/lib/format";
 import { validateProfile } from "@/lib/validateProfile";
+import { Button } from "./ui/Button";
+import { Card } from "./ui/Card";
 
 export type DemoPersonaId = "aisyah" | "daniel" | "weijian" | "farah";
 
-const DEMO_PERSONAS: { id: DemoPersonaId; label: string }[] = [
-  { id: "aisyah", label: "Aisyah, 26" },
-  { id: "daniel", label: "Daniel, 31" },
-  { id: "weijian", label: "Wei Jian, 29" },
-  { id: "farah", label: "Farah, 23" },
+const DEMO_PERSONAS: { id: DemoPersonaId; label: string; quote: string }[] = [
+  { id: "aisyah", label: AISYAH.label, quote: AISYAH.quote },
+  { id: "daniel", label: DANIEL.label, quote: DANIEL.quote },
+  { id: "weijian", label: WEIJIAN.label, quote: WEIJIAN.quote },
+  { id: "farah", label: FARAH.label, quote: FARAH.quote },
 ];
 
 type Props = {
@@ -70,53 +73,119 @@ export function ProfileForm({ initialProfile, onSave, onLoadDemo }: Props) {
     onSave(profile);
   };
 
+  const inputClasses =
+    "mt-1 w-full border border-navy/15 bg-paper px-3 py-2 text-sm focus:border-teal focus:outline-none";
+  const labelClasses = "block text-sm font-medium text-navy/80";
+
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <h2>Load a demo persona</h2>
-        {DEMO_PERSONAS.map((persona) => (
-          <button key={persona.id} type="button" onClick={() => onLoadDemo(persona.id)}>
-            {persona.label}
-          </button>
-        ))}
-      </div>
+    <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+      <Card label="DEMO PERSONAS" className="p-6">
+        <h2 className="font-display text-lg">Load a demo persona</h2>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {DEMO_PERSONAS.map((persona) => (
+            <button
+              key={persona.id}
+              type="button"
+              onClick={() => onLoadDemo(persona.id)}
+              className="border border-navy/10 p-4 text-left hover:border-teal"
+            >
+              <p className="font-display text-sm font-semibold">{persona.label}</p>
+              <p className="mt-1.5 text-sm italic text-navy/70">&ldquo;{persona.quote}&rdquo;</p>
+            </button>
+          ))}
+        </div>
+      </Card>
 
-      <label htmlFor="profile-label">Label</label>
-      <input id="profile-label" value={values.label} onChange={set("label")} />
+      <Card label="YOUR PROFILE" className="p-6">
+        <div className="flex flex-col gap-4">
+          <div>
+            <label htmlFor="profile-label" className={labelClasses}>
+              Label
+            </label>
+            <input
+              id="profile-label"
+              value={values.label}
+              onChange={set("label")}
+              className={inputClasses}
+            />
+          </div>
 
-      <label htmlFor="profile-income">Income (RM/month)</label>
-      <input id="profile-income" type="number" value={values.income} onChange={set("income")} />
+          <div>
+            <label htmlFor="profile-income" className={labelClasses}>
+              Income (RM/month)
+            </label>
+            <input
+              id="profile-income"
+              type="number"
+              value={values.income}
+              onChange={set("income")}
+              className={inputClasses}
+            />
+          </div>
 
-      <label htmlFor="profile-fixed-expenses">Fixed expenses (RM/month)</label>
-      <input
-        id="profile-fixed-expenses"
-        type="number"
-        value={values.fixedExpenses}
-        onChange={set("fixedExpenses")}
-      />
+          <div>
+            <label htmlFor="profile-fixed-expenses" className={labelClasses}>
+              Fixed expenses (RM/month)
+            </label>
+            <input
+              id="profile-fixed-expenses"
+              type="number"
+              value={values.fixedExpenses}
+              onChange={set("fixedExpenses")}
+              className={inputClasses}
+            />
+          </div>
 
-      <label htmlFor="profile-var-expenses">Variable expenses (RM/month)</label>
-      <input
-        id="profile-var-expenses"
-        type="number"
-        value={values.varExpenses}
-        onChange={set("varExpenses")}
-      />
+          <div>
+            <label htmlFor="profile-var-expenses" className={labelClasses}>
+              Variable expenses (RM/month)
+            </label>
+            <input
+              id="profile-var-expenses"
+              type="number"
+              value={values.varExpenses}
+              onChange={set("varExpenses")}
+              className={inputClasses}
+            />
+          </div>
 
-      <label htmlFor="profile-savings">Savings (RM)</label>
-      <input id="profile-savings" type="number" value={values.savings} onChange={set("savings")} />
+          <div>
+            <label htmlFor="profile-savings" className={labelClasses}>
+              Savings (RM)
+            </label>
+            <input
+              id="profile-savings"
+              type="number"
+              value={values.savings}
+              onChange={set("savings")}
+              className={inputClasses}
+            />
+          </div>
 
-      <label htmlFor="profile-loan-monthly">Loan monthly repayment (RM/month)</label>
-      <input
-        id="profile-loan-monthly"
-        type="number"
-        value={values.loanMonthly}
-        onChange={set("loanMonthly")}
-      />
+          <div>
+            <label htmlFor="profile-loan-monthly" className={labelClasses}>
+              Loan monthly repayment (RM/month)
+            </label>
+            <input
+              id="profile-loan-monthly"
+              type="number"
+              value={values.loanMonthly}
+              onChange={set("loanMonthly")}
+              className={inputClasses}
+            />
+          </div>
 
-      {error && <p role="alert">{error.message}</p>}
+          {error && (
+            <p role="alert" className="text-sm text-risk-high">
+              {error.message}
+            </p>
+          )}
 
-      <button type="submit">Save profile</button>
+          <Button type="submit" className="self-start">
+            Save profile
+          </Button>
+        </div>
+      </Card>
     </form>
   );
 }

@@ -62,8 +62,8 @@ export default function ProfilePage() {
   };
 
   return (
-    <main>
-      <h1>Profile</h1>
+    <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
+      <h1 className="font-display text-3xl">Profile</h1>
       {saved && <p role="status">Profile saved.</p>}
       {error && <p role="alert">{error}</p>}
       <ProfileForm

@@ -30,6 +30,10 @@ const config: Config = {
       },
     },
   },
+  safelist: [
+    { pattern: /^(text|border|stroke)-risk-(low|moderate|high)$/ },
+    { pattern: /^bg-risk-(low|moderate|high)(\/(10|15))?$/ },
+  ],
   plugins: [],
 };
 
