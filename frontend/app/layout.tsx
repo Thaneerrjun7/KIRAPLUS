@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Bricolage_Grotesque, IBM_Plex_Mono, Source_Serif_4 } from "next/font/google";
+import { Nav } from "@/components/Nav";
 import { SyntheticDataNotice } from "@/components/SyntheticDataNotice";
 
 // Brand system typography, see frontend/docs/design.md ("Brand system"):
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body className="min-h-screen bg-paper font-body text-navy">
+        <Nav />
         {children}
         <SyntheticDataNotice />
       </body>
