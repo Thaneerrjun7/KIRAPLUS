@@ -6,10 +6,12 @@ that stays in services/ and utils/, unchanged by this file.
 """
 import os
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.routers import assessments, explanations, profiles, simulations
+from errors import ValidationError
 
 app = FastAPI(title="KIRA+ API", version=os.environ.get("KIRA_ENGINE_VERSION", "1.0.0"))
 
@@ -21,6 +23,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.exception_handler(ValidationError)
+def handle_validation_error(request: Request, exc: ValidationError) -> JSONResponse:
+    return JSONResponse(status_code=422, content={"field": exc.field, "message": exc.message})
 
 app.include_router(profiles.router)
 app.include_router(assessments.router)
