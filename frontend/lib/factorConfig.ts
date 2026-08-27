@@ -13,15 +13,67 @@ export type FactorConfig = {
   label: string;
   weight: number;
   featureKey: keyof Features;
+  // README.md "Scoring methodology" table -- published, not derived.
+  featureDescription: string;
+  zeroAt: string;
+  fullAt: string;
 };
 
 export const FACTORS: FactorConfig[] = [
-  { key: "debt_burden", label: "Debt burden", weight: 25, featureKey: "dsr" },
-  { key: "bnpl_exposure", label: "BNPL exposure", weight: 20, featureKey: "bnpl_ratio" },
-  { key: "disposable_income", label: "Disposable income", weight: 20, featureKey: "buffer_ratio" },
-  { key: "emergency_buffer", label: "Emergency buffer", weight: 15, featureKey: "runway_months" },
-  { key: "repayment_capacity", label: "Repayment capacity", weight: 12, featureKey: "coverage" },
-  { key: "savings_resilience", label: "Savings resilience", weight: 8, featureKey: "savings_months" },
+  {
+    key: "debt_burden",
+    label: "Debt burden",
+    weight: 25,
+    featureKey: "dsr",
+    featureDescription: "debt service ratio",
+    zeroAt: "0.45",
+    fullAt: "0.05",
+  },
+  {
+    key: "bnpl_exposure",
+    label: "BNPL exposure",
+    weight: 20,
+    featureKey: "bnpl_ratio",
+    featureDescription: "BNPL ÷ income",
+    zeroAt: "0.20",
+    fullAt: "0.02",
+  },
+  {
+    key: "disposable_income",
+    label: "Disposable income",
+    weight: 20,
+    featureKey: "buffer_ratio",
+    featureDescription: "buffer ÷ income",
+    zeroAt: "0.00",
+    fullAt: "0.30",
+  },
+  {
+    key: "emergency_buffer",
+    label: "Emergency buffer",
+    weight: 15,
+    featureKey: "runway_months",
+    featureDescription: "savings ÷ monthly outflow",
+    zeroAt: "0 months",
+    fullAt: "6 months",
+  },
+  {
+    key: "repayment_capacity",
+    label: "Repayment capacity",
+    weight: 12,
+    featureKey: "coverage",
+    featureDescription: "buffer ÷ debt service",
+    zeroAt: "0×",
+    fullAt: "2×",
+  },
+  {
+    key: "savings_resilience",
+    label: "Savings resilience",
+    weight: 8,
+    featureKey: "savings_months",
+    featureDescription: "savings ÷ income",
+    zeroAt: "0 months",
+    fullAt: "3 months",
+  },
 ];
 
 export type Strength = "Critical" | "Weak" | "Adequate" | "Strong";

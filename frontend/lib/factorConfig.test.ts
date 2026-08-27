@@ -21,6 +21,17 @@ describe("FACTORS", () => {
     expect(total).toBe(100);
   });
 
+  it("carries the published feature description and 0/100 anchor points", () => {
+    const debtBurden = FACTORS.find((f) => f.key === "debt_burden")!;
+    expect(debtBurden.featureDescription).toBe("debt service ratio");
+    expect(debtBurden.zeroAt).toBe("0.45");
+    expect(debtBurden.fullAt).toBe("0.05");
+
+    const emergencyBuffer = FACTORS.find((f) => f.key === "emergency_buffer")!;
+    expect(emergencyBuffer.zeroAt).toBe("0 months");
+    expect(emergencyBuffer.fullAt).toBe("6 months");
+  });
+
   it("each factor's featureKey resolves to Aisyah's fixture value for that factor", () => {
     const debtBurden = FACTORS.find((f) => f.key === "debt_burden")!;
     expect(AISYAH.expected.features[debtBurden.featureKey]).toBe(AISYAH.expected.features.dsr);
