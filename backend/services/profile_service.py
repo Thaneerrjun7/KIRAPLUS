@@ -46,28 +46,52 @@ def _validate(profile: dict) -> None:
 def save_profile(profile: dict) -> dict:
     """Validate, persist, return {profile_id, updated_at}.
 
-    Cascades commitment inserts. Raises ValidationError before touching the database.
+    Upserts: an incoming profile_id updates that profile in place (replacing its commitments
+    wholesale), profile_id=None inserts a new one. Raises ValidationError before touching the
+    database, and if an incoming profile_id doesn't exist.
     """
     _validate(profile)
     now = datetime.now(timezone.utc).isoformat()
     conn = _connect()
     try:
-        cur = conn.execute(
-            """INSERT INTO profiles
-               (label, income_sen, fixed_expenses_sen, var_expenses_sen, savings_sen,
-                loan_monthly_sen, is_demo, updated_at)
-               VALUES (?, ?, ?, ?, ?, ?, 0, ?)""",
-            (
-                profile.get("label", ""),
-                profile["income_sen"],
-                profile["fixed_expenses_sen"],
-                profile["var_expenses_sen"],
-                profile["savings_sen"],
-                profile.get("loan_monthly_sen", 0),
-                now,
-            ),
-        )
-        profile_id = cur.lastrowid
+        profile_id = profile.get("profile_id")
+        if profile_id is None:
+            cur = conn.execute(
+                """INSERT INTO profiles
+                   (label, income_sen, fixed_expenses_sen, var_expenses_sen, savings_sen,
+                    loan_monthly_sen, is_demo, updated_at)
+                   VALUES (?, ?, ?, ?, ?, ?, 0, ?)""",
+                (
+                    profile.get("label", ""),
+                    profile["income_sen"],
+                    profile["fixed_expenses_sen"],
+                    profile["var_expenses_sen"],
+                    profile["savings_sen"],
+                    profile.get("loan_monthly_sen", 0),
+                    now,
+                ),
+            )
+            profile_id = cur.lastrowid
+        else:
+            cur = conn.execute(
+                """UPDATE profiles
+                   SET label = ?, income_sen = ?, fixed_expenses_sen = ?, var_expenses_sen = ?,
+                       savings_sen = ?, loan_monthly_sen = ?, updated_at = ?
+                   WHERE profile_id = ?""",
+                (
+                    profile.get("label", ""),
+                    profile["income_sen"],
+                    profile["fixed_expenses_sen"],
+                    profile["var_expenses_sen"],
+                    profile["savings_sen"],
+                    profile.get("loan_monthly_sen", 0),
+                    now,
+                    profile_id,
+                ),
+            )
+            if cur.rowcount == 0:
+                raise ValidationError(f"Profile {profile_id} not found.", field="profile_id")
+            conn.execute("DELETE FROM commitments WHERE profile_id = ?", (profile_id,))
         for commitment in profile.get("commitments", []):
             conn.execute(
                 """INSERT INTO commitments
