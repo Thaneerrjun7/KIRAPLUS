@@ -108,3 +108,47 @@ def test_load_demo_returns_unsaved_aisyah_matching_fixtures():
 def test_load_demo_unknown_name_raises_validation_error():
     with pytest.raises(ValidationError):
         profile_service.load_demo("not-a-real-persona")
+
+
+def test_save_profile_with_existing_profile_id_updates_in_place():
+    created = profile_service.save_profile(_valid_profile())
+    profile_id = created["profile_id"]
+
+    updated = profile_service.save_profile(
+        _valid_profile(profile_id=profile_id, income_sen=500000)
+    )
+
+    assert updated["profile_id"] == profile_id
+    assert len(profile_service.list_profiles()) == 1
+    assert profile_service.load_profile(profile_id)["income_sen"] == 500000
+
+
+def test_save_profile_update_replaces_commitments_wholesale():
+    created = profile_service.save_profile(_valid_profile())
+    profile_id = created["profile_id"]
+
+    profile_service.save_profile(
+        _valid_profile(
+            profile_id=profile_id,
+            commitments=[
+                {
+                    "label": "New phone",
+                    "provider": "Grab PayLater",
+                    "kind": "bnpl",
+                    "monthly_sen": 5000,
+                    "outstanding_sen": 20000,
+                    "months_left": 4,
+                    "next_due": "2026-10-01",
+                }
+            ],
+        )
+    )
+
+    commitments = profile_service.load_profile(profile_id)["commitments"]
+    assert len(commitments) == 1
+    assert commitments[0]["label"] == "New phone"
+
+
+def test_save_profile_with_unknown_profile_id_raises_validation_error():
+    with pytest.raises(ValidationError):
+        profile_service.save_profile(_valid_profile(profile_id=999))
