@@ -15,3 +15,22 @@ export function bandToRisk(band: Band): RiskLevel {
       return "high";
   }
 }
+
+export type WarningLevel = "red" | "amber";
+
+export function warningLevelToRisk(level: WarningLevel): RiskLevel {
+  return level === "red" ? "high" : "moderate";
+}
+
+export type VerdictLevel = "green" | "amber" | "red";
+
+export function verdictLevelToRisk(level: VerdictLevel): RiskLevel {
+  switch (level) {
+    case "green":
+      return "low";
+    case "amber":
+      return "moderate";
+    case "red":
+      return "high";
+  }
+}
