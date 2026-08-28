@@ -1,0 +1,10 @@
+{
+  // Deploys frontend/out/ (the static export from `npm run build`) as a
+  // Workers Static Assets site -- no Worker script, just static file serving.
+  // Deployed via `wrangler deploy` in .github/workflows/deploy-frontend.yml.
+  "name": "kiraplus-frontend",
+  "compatibility_date": "2026-08-28",
+  "assets": {
+    "directory": "./out"
+  }
+}
