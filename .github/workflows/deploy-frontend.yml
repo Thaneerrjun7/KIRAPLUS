@@ -11,7 +11,12 @@ name: Deploy frontend
 on:
   push:
     branches: [main]
-    paths: ["frontend/**"]
+    # This workflow file itself is included so a CI-only fix here can
+    # actually trigger a run -- a push touching only .github/workflows/**
+    # doesn't match a paths filter of just "frontend/**" (learned this the
+    # hard way: #20 fixed a Wrangler version pin but never ran on merge).
+    paths: ["frontend/**", ".github/workflows/deploy-frontend.yml"]
+  workflow_dispatch: {}
 
 jobs:
   build-deploy:

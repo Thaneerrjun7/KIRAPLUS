@@ -14,7 +14,11 @@ on:
     branches: [main]
     # data/** is included because it's baked into the image too -- see
     # backend/Dockerfile's comment on why (profile_service.py's fixture path).
-    paths: ["backend/**", "data/**"]
+    # This workflow file itself is included too, so a CI-only fix here can
+    # actually trigger a run on merge -- see deploy-frontend.yml's comment on
+    # the same gap, hit for real in #20.
+    paths: ["backend/**", "data/**", ".github/workflows/deploy-backend.yml"]
+  workflow_dispatch: {}
 
 jobs:
   build-push:
