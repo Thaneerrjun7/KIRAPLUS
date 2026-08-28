@@ -41,3 +41,9 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: frontend
           command: deploy
+          # cloudflare/wrangler-action's own default Wrangler version predates
+          # assets-only deploys (no `main` script) -- without this pin it
+          # fails with "Missing entry-point", even though the exact same
+          # wrangler.jsonc deploys fine locally with a current Wrangler.
+          # Pinned to the version verified locally (see DEPLOYMENT-CHECKLIST.md).
+          wranglerVersion: "4.127.0"
