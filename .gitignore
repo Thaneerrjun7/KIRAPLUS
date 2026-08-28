@@ -227,6 +227,7 @@ node_modules/
 frontend/playwright-report/
 frontend/test-results/
 out/
+.wrangler/
 next-env.d.ts
 frontend/.env.local
 
