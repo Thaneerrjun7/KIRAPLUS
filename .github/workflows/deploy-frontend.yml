@@ -26,7 +26,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Wrangler 4.x requires Node >=22 -- this sets the Node version for
+          # every step in the job, including the wrangler-action step below,
+          # not just the build step. 20 failed CI with "Wrangler requires at
+          # least Node.js v22.0.0" even though the build itself doesn't need
+          # more than 20.
+          node-version: 22
 
       - run: npm ci
         working-directory: frontend
