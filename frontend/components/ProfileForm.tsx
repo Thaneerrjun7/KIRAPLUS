@@ -74,8 +74,8 @@ export function ProfileForm({ initialProfile, onSave, onLoadDemo }: Props) {
   };
 
   const inputClasses =
-    "mt-1 w-full border border-navy/15 bg-paper px-3 py-2 text-sm focus:border-teal focus:outline-none";
-  const labelClasses = "block text-sm font-medium text-navy/80";
+    "mt-1 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm focus:border-teal focus:outline-none";
+  const labelClasses = "block text-sm font-medium text-slate";
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -87,10 +87,10 @@ export function ProfileForm({ initialProfile, onSave, onLoadDemo }: Props) {
               key={persona.id}
               type="button"
               onClick={() => onLoadDemo(persona.id)}
-              className="border border-navy/10 p-4 text-left hover:border-teal"
+              className="rounded-xl border border-border p-4 text-left hover:border-teal"
             >
               <p className="font-display text-sm font-semibold">{persona.label}</p>
-              <p className="mt-1.5 text-sm italic text-navy/70">&ldquo;{persona.quote}&rdquo;</p>
+              <p className="mt-1.5 text-sm italic text-slate">&ldquo;{persona.quote}&rdquo;</p>
             </button>
           ))}
         </div>
