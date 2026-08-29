@@ -84,4 +84,10 @@ describe("CommitmentsTable", () => {
       AISYAH.profile.commitments[2],
     ]);
   });
+
+  it("keeps the desktop table and mobile cards on separate breakpoint-controlled containers", () => {
+    render(<CommitmentsTable commitments={AISYAH.profile.commitments} onChange={vi.fn()} />);
+    expect(screen.getByTestId("commitments-desktop")).toHaveClass("hidden", "md:block");
+    expect(screen.getByTestId("commitments-mobile")).toHaveClass("md:hidden");
+  });
 });

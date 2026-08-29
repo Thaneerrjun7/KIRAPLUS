@@ -44,7 +44,7 @@ export function MarketingNav() {
           aria-label="Toggle menu"
           aria-expanded={open}
           onClick={() => setOpen((value) => !value)}
-          className="md:hidden"
+          className="-m-2.5 p-2.5 md:hidden"
         >
           {open ? (
             <XMarkIcon className="h-6 w-6 text-navy" />

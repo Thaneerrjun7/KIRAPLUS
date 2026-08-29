@@ -1,8 +1,9 @@
 import type { Config } from "tailwindcss";
 
 // Brand palette + risk colors -- see frontend/docs/design.md ("Brand system",
-// "Risk / band colors"). This is the single source; components reference
-// these via class names (bg-risk-low, text-risk-high, etc.), never raw hex.
+// "Risk / band colors") and docs/superpowers/specs/2026-08-29-mobile-shell-redesign-design.md
+// for the full current token list. Components reference these via class names
+// (bg-risk-low, text-risk-high, etc.), never raw hex.
 const config: Config = {
   content: [
     "./app/**/*.{ts,tsx}",
@@ -22,7 +23,7 @@ const config: Config = {
         jade: "#1E8E7E",
         gold: "#B7791B",
         surface: "#FFFFFF",
-        surfaceAlt: "#F4F5F5",
+        "surface-alt": "#F4F5F5",
         border: "#E2E4E5",
         mist: "#919A9F",
         slate: "#606D75",

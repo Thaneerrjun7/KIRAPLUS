@@ -8,6 +8,9 @@ first pass to edit against, not a spec to implement blindly.
 ## Brand system
 
 Carried over verbatim from the Master Package — the brand doesn't change with the framework swap.
+**Note:** this file predates the mobile-shell redesign. The Palette and Typography rows below were
+updated to match what actually shipped; for the full current token list and rationale, see
+`docs/superpowers/specs/2026-08-29-mobile-shell-redesign-design.md`, not this file.
 
 | Element | Decision | Reasoning |
 |---|---|---|
@@ -16,8 +19,8 @@ Carried over verbatim from the Master Package — the brand doesn't change with 
 | Support line | See the consequences before you commit. | English-first, for institutional/government audiences. |
 | Positioning | Government-grade trust, consumer-grade simplicity. | Two audiences, one product. |
 | Personality | Modern · Malaysian · trustworthy · intelligent · approachable · inclusive | A calm advisor, not an alarm. |
-| Palette | Deep petrol navy `#0B1F2A` · sea teal `#0F5C56` · jade `#1E8E7E` · songket gold `#B7791B` · warm paper `#FBFAF7` | Teal-biased navy avoids generic banking blue. Risk states use clay red, never emergency red. |
-| Typography | Display: Bricolage Grotesque · Body: Source Serif 4 · Data: IBM Plex Mono | Instrument-panel grotesque for headings, serif for reading gravity, mono for every ringgit figure. All three are on Google Fonts. |
+| Palette | Deep petrol navy `#0B1F2A` · sea teal `#0F5C56` · jade `#1E8E7E` · songket gold `#B7791B`, layered on a near-white `surface` canvas (`#FFFFFF`) plus a neutral scale (`surface`/`surface-alt`/`border`/`mist`/`slate`) — the redesign spec has the full token list. | Teal-biased navy avoids generic banking blue. Risk states use clay red, never emergency red. |
+| Typography | A single Inter family for display, body, and data — `font-display`/`font-body`/`font-mono` still exist as Tailwind class names, they just all resolve to Inter now. See the redesign spec for why. | One typeface reduces visual noise in the mobile shell. Inter is on Google Fonts. |
 | Iconography | Line icons, 1.75px stroke, rounded caps — gauge, ledger rule, tally, arrow-into-future | Measuring instruments, not shopping bags. |
 | Tone of voice | Second person, present tense, no jargon, no shame — "This would leave you RM750 a month," not "you cannot afford this" | We inform a decision; the user makes it. |
 
@@ -39,7 +42,7 @@ exactly one new one:
 
 ```ts
 colors: {
-  navy: '#0B1F2A', teal: '#0F5C56', jade: '#1E8E7E', gold: '#B7791B', paper: '#FBFAF7',
+  navy: '#0B1F2A', teal: '#0F5C56', jade: '#1E8E7E', gold: '#B7791B',
   risk: { low: '#1E8E7E', moderate: '#B7791B', high: '#B5533C' },
 }
 ```
@@ -53,7 +56,7 @@ principle the unit rule already applies to currency.
 
 | Element | Choice | Why |
 |---|---|---|
-| Score gauge | Hand-rolled SVG semicircle arc (no charting library) | A gauge is one arc + a fill percentage — a library adds weight for something this simple, and a custom SVG gets exact brand control (IBM Plex Mono for the number, `risk.*` fill color, matches the "measuring instrument" iconography directly). |
+| Score gauge | Hand-rolled SVG semicircle arc (no charting library) | A gauge is one arc + a fill percentage — a library adds weight for something this simple, and a custom SVG gets exact brand control (Inter for the number, `risk.*` fill color, matches the "measuring instrument" iconography directly). |
 | Six-factor breakdown | **Recharts** horizontal bar chart | Mature, good Next.js support, matches the Master Package's own original suggestion (Plotly horizontal bar), and naturally colors each bar by the Strong/Adequate/Weak/Critical classification using the same `risk.*` tokens. |
 
 Recharts is the only charting dependency this adds — don't reach for a second library for the gauge.

@@ -54,7 +54,7 @@ export default function Home() {
           </Button>
         </div>
 
-        <div className="relative rounded-xl border border-border bg-surface p-6 shadow-card">
+        <div className="relative rounded-xl border border-border bg-surface p-6">
           <span className="absolute left-4 top-3 font-mono text-[10px] uppercase tracking-wider text-mist">
             KIRA score -- live preview
           </span>

@@ -55,7 +55,7 @@ band = LOW >= 70  ·  MODERATE 45-69  ·  HIGH < 45`}
       </Card>
 
       <Card label="SYNTHETIC DATA" className="mt-6 p-6">
-        <p className="text-navy/80">
+        <p className="text-slate">
           Every profile in this demo, including the four named personas, is synthetic. These
           profiles are constructed to exercise every branch of the scoring engine. They are not
           real people and not research subjects. No real consumer financial data appears anywhere

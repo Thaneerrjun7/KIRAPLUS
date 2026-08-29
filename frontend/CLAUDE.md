@@ -18,9 +18,11 @@ need. Read before building anything:
 
 ## Scope
 
-This directory owns the five MVP pages (`app/profile`, `app/commitments`, `app/dashboard`,
-`app/simulator`, `app/about`), `lib/format.ts`, and `lib/api.ts`. Nothing here computes a score, a
-warning, or a recommendation — it renders what `backend/` returns and formats sen into ringgit.
+This directory owns the five MVP pages, split into a marketing shell and an app shell via route
+groups (`app/(marketing)/page.tsx`, `app/(marketing)/about/`, `app/(app)/profile/`,
+`app/(app)/commitments/`, `app/(app)/dashboard/`, `app/(app)/simulator/`), `lib/format.ts`, and
+`lib/api.ts`. Nothing here computes a score, a warning, or a recommendation — it renders what
+`backend/` returns and formats sen into ringgit.
 
 ## The sen/ringgit boundary lives here now
 

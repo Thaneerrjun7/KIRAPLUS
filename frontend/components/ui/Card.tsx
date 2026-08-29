@@ -8,7 +8,7 @@ type Props = {
 
 export function Card({ children, className = "", label }: Props) {
   return (
-    <div className={`relative rounded-xl border border-border bg-surface ${className}`.trim()}>
+    <div className={`relative rounded-xl border border-border bg-surface shadow-card ${className}`.trim()}>
       {label && (
         <span className="absolute left-4 top-3 font-mono text-[10px] uppercase tracking-wider text-mist">
           {label}

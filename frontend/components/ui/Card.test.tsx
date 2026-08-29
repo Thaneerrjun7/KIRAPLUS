@@ -22,4 +22,9 @@ describe("Card", () => {
     const { container } = render(<Card>Hello</Card>);
     expect(container.firstChild).toHaveClass("bg-surface", "border-border", "rounded-xl");
   });
+
+  it("carries the shared card shadow", () => {
+    const { container } = render(<Card>Hello</Card>);
+    expect(container.firstChild).toHaveClass("shadow-card");
+  });
 });
