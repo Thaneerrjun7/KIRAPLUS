@@ -1,21 +1,9 @@
 """T-08 -- simulator correctness (docs/API-CONTRACT.md §4, §7)."""
 
-import json
-
 import pytest
 
 from errors import ValidationError
 from services.simulation_service import simulate, simulate_grid
-
-
-@pytest.fixture
-def aisyah_profile():
-    with open("data/mock-data.json", encoding="utf-8") as fixture_file:
-        aisyah = next(
-            persona for persona in json.load(fixture_file)["personas"]
-            if persona["id"] == "aisyah"
-        )
-    return {**aisyah["profile"], "commitments": aisyah["commitments"]}
 
 
 def test_simulate_matches_the_frozen_aisyah_phone_fixture(aisyah_profile):

@@ -1,15 +1,10 @@
 """T-09 -- warning triggers (docs/API-CONTRACT.md §3, §7)."""
 
-import json
-
 from utils.scoring import kira_score
 from utils.warnings import evaluate
 
 
-def test_fixture_warning_codes_match_the_frozen_personas():
-    with open("data/mock-data.json", encoding="utf-8") as fixture_file:
-        personas = json.load(fixture_file)["personas"]
-
+def test_fixture_warning_codes_match_the_frozen_personas(personas):
     for persona in personas:
         profile = {**persona["profile"], "commitments": persona["commitments"]}
         warnings = evaluate(kira_score(profile)["features"], p_stress_12m=None)

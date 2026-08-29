@@ -1,18 +1,10 @@
 """Assessment orchestration for the Dashboard API contract."""
 
-import json
-
 from services.scoring_service import assess
 
 
-def test_assess_returns_the_complete_aisyah_dashboard_payload_without_a_model():
-    with open("data/mock-data.json", encoding="utf-8") as fixture_file:
-        aisyah = next(
-            persona for persona in json.load(fixture_file)["personas"]
-            if persona["id"] == "aisyah"
-        )
-
-    result = assess({**aisyah["profile"], "commitments": aisyah["commitments"]})
+def test_assess_returns_the_complete_aisyah_dashboard_payload_without_a_model(aisyah_profile):
+    result = assess(aisyah_profile)
 
     assert result["score"] == 68
     assert result["band"] == "MODERATE RISK"
