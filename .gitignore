@@ -235,3 +235,11 @@ frontend/.env.local
 
 # Personal deployment runbook -- never share domain/IP/paths in tracked docs
 DEPLOYMENT-CHECKLIST.md
+
+# Local-only UI mock for dashboard/simulator while scoring_service/simulation_service are stubs --
+# not Arjun's work, never committed
+mock-backend.mjs
+.superpowers/
+
+# Playwright MCP's own snapshot/screenshot cache
+.playwright-mcp/
