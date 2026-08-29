@@ -4,7 +4,7 @@
 
 export function SyntheticDataNotice() {
   return (
-    <footer className="border-t border-navy/10 bg-paper px-4 py-2 text-center text-sm text-navy/70">
+    <footer className="border-t border-border bg-surface px-4 py-2 text-center text-sm text-slate">
       This demo runs on synthetic data. No real financial information is stored or analyzed.
     </footer>
   );

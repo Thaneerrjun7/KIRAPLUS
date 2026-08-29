@@ -81,7 +81,7 @@ export default function SimulatorPage() {
     <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
       <h1 className="font-display text-3xl">Simulator</h1>
       <div className="mt-6 max-w-xs">
-        <label htmlFor="purchase-price" className="block text-sm font-medium text-navy/80">
+        <label htmlFor="purchase-price" className="block text-sm font-medium text-slate">
           Purchase price (RM)
         </label>
         <input
@@ -89,7 +89,7 @@ export default function SimulatorPage() {
           type="number"
           value={priceRinggit}
           onChange={(e) => setPriceRinggit(e.target.value)}
-          className="mt-1 w-full border border-navy/15 bg-paper px-3 py-2 text-sm focus:border-teal focus:outline-none"
+          className="mt-1 w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm tabular-nums focus:border-teal focus:outline-none"
         />
       </div>
 
