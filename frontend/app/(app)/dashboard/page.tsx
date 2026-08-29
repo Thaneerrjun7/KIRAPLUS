@@ -8,6 +8,7 @@ import { FactorBreakdown } from "@/components/FactorBreakdown";
 import { ScoreGauge } from "@/components/ScoreGauge";
 import { WarningList } from "@/components/WarningList";
 import { Card } from "@/components/ui/Card";
+import { Spinner } from "@/components/ui/Spinner";
 import { assess, explain, loadProfile, type Assessment } from "@/lib/api";
 import { rankFactorsByLostContribution } from "@/lib/factorConfig";
 import type { Profile } from "@/lib/fixtures";
@@ -95,7 +96,10 @@ export default function DashboardPage() {
     return (
       <main className="mx-auto max-w-5xl px-4 py-10 md:py-12">
         <h1 className="font-display text-3xl">Dashboard</h1>
-        <p>Loading your assessment…</p>
+        <p>
+          <Spinner className="mr-2" />
+          Loading your assessment…
+        </p>
       </main>
     );
   }
