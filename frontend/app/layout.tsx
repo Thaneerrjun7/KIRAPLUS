@@ -2,6 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
+import { SplashScreen } from "@/components/SplashScreen";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -17,7 +18,9 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={inter.variable}>
-      <body className="min-h-screen bg-surface font-body text-navy">{children}</body>
+      <body className="min-h-screen bg-surface font-body text-navy">
+        <SplashScreen>{children}</SplashScreen>
+      </body>
     </html>
   );
 }

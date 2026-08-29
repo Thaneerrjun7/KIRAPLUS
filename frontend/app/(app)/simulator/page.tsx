@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from "react";
 import { SimulatorPanel } from "@/components/SimulatorPanel";
+import { Spinner } from "@/components/ui/Spinner";
 import { assess, loadProfile, simulateGrid, type GridEntry } from "@/lib/api";
 import { toSen } from "@/lib/format";
 import type { Band, Profile } from "@/lib/fixtures";
@@ -104,7 +105,10 @@ export default function SimulatorPage() {
             bufferBeforeSen={baseline.bufferSen}
           />
         ) : (
-          <p>Loading&hellip;</p>
+          <p>
+            <Spinner className="mr-2" />
+            Loading&hellip;
+          </p>
         )}
       </div>
     </main>
