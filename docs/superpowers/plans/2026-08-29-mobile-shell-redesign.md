@@ -520,8 +520,6 @@ git commit -m "feat(frontend): add collapsible MarketingNav for the marketing sh
 **Files:**
 - Create: `frontend/components/AppNav.tsx`
 - Create: `frontend/components/AppNav.test.tsx`
-- Delete: `frontend/components/Nav.tsx`
-- Delete: `frontend/components/Nav.test.tsx`
 
 **Interfaces:**
 - Consumes: `usePathname`, the four existing Heroicons (`UserCircleIcon`, `ListBulletIcon`,
@@ -529,6 +527,12 @@ git commit -m "feat(frontend): add collapsible MarketingNav for the marketing sh
 - Produces: `export function AppNav(): JSX.Element` — no props. Renders **two** `<nav aria-label="Main">`
   elements (desktop top bar, mobile bottom bar), toggled by Tailwind breakpoint classes, not
   `matchMedia` (avoids SSR/hydration mismatches). Consumed by Task 6's `app/(app)/layout.tsx`.
+
+Note: `frontend/components/Nav.tsx`/`Nav.test.tsx` are **not** deleted in this task, even though
+`AppNav` supersedes them — `app/layout.tsx` still imports `Nav` until Task 6 rewires it, so deleting
+it here would break `npm run build` (though not `npm test`, since no test file imports
+`app/layout.tsx`) for the commit range between this task and Task 6. The deletion happens in Task 6,
+in the same commit that removes the import.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -671,25 +675,18 @@ export function AppNav() {
 Run: `cd frontend && npx vitest run components/AppNav.test.tsx`
 Expected: PASS, all 3 tests.
 
-- [ ] **Step 5: Delete the superseded `Nav` component**
-
-```bash
-cd frontend
-git rm components/Nav.tsx components/Nav.test.tsx
-```
-
-- [ ] **Step 6: Run the whole suite**
+- [ ] **Step 5: Run the whole suite**
 
 Run: `cd frontend && npm test`
-Expected: all tests pass (no other file imports `Nav` — it was only ever used by `app/layout.tsx`,
-which Task 6 rewires).
+Expected: all tests pass. `Nav.tsx`/`Nav.test.tsx` still exist and still pass at this point — they
+are removed in Task 6, not here (see the note above).
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 6: Commit**
 
 ```bash
 cd frontend
 git add components/AppNav.tsx components/AppNav.test.tsx
-git commit -m "feat(frontend): add AppNav (desktop top bar / mobile bottom bar), remove Nav"
+git commit -m "feat(frontend): add AppNav (desktop top bar / mobile bottom bar)"
 ```
 
 ---
@@ -698,6 +695,8 @@ git commit -m "feat(frontend): add AppNav (desktop top bar / mobile bottom bar),
 
 **Files:**
 - Modify: `frontend/app/layout.tsx`
+- Delete: `frontend/components/Nav.tsx`
+- Delete: `frontend/components/Nav.test.tsx`
 - Create: `frontend/app/(marketing)/layout.tsx`
 - Create: `frontend/app/(app)/layout.tsx`
 - Move: `frontend/app/page.tsx` → `frontend/app/(marketing)/page.tsx`
@@ -819,13 +818,23 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 (This absorbs Task 2's font-loader change if it hasn't already landed in this exact form — confirm
 the diff matches; don't duplicate the `Inter(...)` call.)
 
-- [ ] **Step 5: Run the full test suite**
+- [ ] **Step 5: Delete the now-superseded `Nav` component**
+
+The old root layout's `<Nav />` import is gone as of Step 4 — `Nav.tsx` has no remaining consumer,
+so delete it in this same commit rather than leaving it dangling:
+
+```bash
+cd frontend
+git rm components/Nav.tsx components/Nav.test.tsx
+```
+
+- [ ] **Step 6: Run the full test suite**
 
 Run: `cd frontend && npm test`
 Expected: all tests pass — every moved `page.test.tsx` imports its sibling `./page` by relative
 path, which still resolves after the move.
 
-- [ ] **Step 6: Verify the build and route URLs**
+- [ ] **Step 7: Verify the build and route URLs**
 
 Run: `cd frontend && npm run build`
 Expected: build succeeds. Route groups don't appear in the URL — confirm by checking the build's
@@ -833,7 +842,7 @@ route manifest output (`.next/` route list, printed in the `next build` summary)
 `/about`, `/profile`, `/commitments`, `/dashboard`, `/simulator` with no `(marketing)`/`(app)`
 segment.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 cd frontend
@@ -927,13 +936,15 @@ git commit -m "feat(frontend): restyle landing and about pages to the new token 
 - Modify: `frontend/components/ScoreGauge.tsx`
 - Modify: `frontend/components/FactorBreakdown.tsx`
 - Modify: `frontend/components/SyntheticDataNotice.tsx`
+- Modify: `frontend/components/WarningList.tsx`
 
 **Interfaces:**
 - Consumes: `border-border`, `text-mist`, `text-slate`, `bg-surface` (Task 1).
 - Produces: no prop/signature changes anywhere in this task.
 
-`WarningList.tsx` and `VerdictBanner.tsx` need **no changes** — both were checked and use only
-`risk-*` classes plus unstyled default text, no `navy`/`paper` opacity classes to migrate.
+`VerdictBanner.tsx` needs **no changes** — checked, it uses only `risk-*` classes and unstyled
+default text. `WarningList.tsx` needs exactly one substitution (Step 6 below) — its warning `lever`
+text uses `text-navy/70`, missed in an earlier pass of this plan.
 
 - [ ] **Step 1: Dashboard page — disclaimer paragraph**
 
@@ -1013,7 +1024,21 @@ to:
     <footer className="border-t border-border bg-surface px-4 py-2 text-center text-sm text-slate">
 ```
 
-- [ ] **Step 6: Run the affected tests**
+- [ ] **Step 6: `WarningList.tsx` — lever text**
+
+Change:
+
+```tsx
+              {warning.lever && <p className="text-sm text-navy/70">{warning.lever}</p>}
+```
+
+to:
+
+```tsx
+              {warning.lever && <p className="text-sm text-slate">{warning.lever}</p>}
+```
+
+- [ ] **Step 7: Run the affected tests**
 
 Run:
 ```bash
@@ -1025,12 +1050,13 @@ npx vitest run "app/(app)/dashboard/page.test.tsx" "app/(app)/simulator/page.tes
 Expected: all pass unchanged (none of these test files assert on the classes just edited — confirmed
 by inspection before writing this plan).
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 cd frontend
 git add "app/(app)/dashboard/page.tsx" "app/(app)/simulator/page.tsx" \
-        components/ScoreGauge.tsx components/FactorBreakdown.tsx components/SyntheticDataNotice.tsx
+        components/ScoreGauge.tsx components/FactorBreakdown.tsx components/SyntheticDataNotice.tsx \
+        components/WarningList.tsx
 git commit -m "feat(frontend): restyle dashboard/simulator shared components to the new token system"
 ```
 
@@ -1068,9 +1094,7 @@ Add this test to `SimulatorPanel.test.tsx`:
         bufferBeforeSen={95000}
       />
     );
-    const beforeLabel = screen.getByText("Before");
-    const grid = beforeLabel.parentElement;
-    expect(grid).toHaveClass("grid-cols-1", "md:grid-cols-2");
+    expect(screen.getByTestId("before-after-grid")).toHaveClass("grid-cols-1", "md:grid-cols-2");
   });
 ```
 
@@ -1092,7 +1116,10 @@ Change:
 to:
 
 ```tsx
-        <div className="mt-5 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 md:gap-y-3">
+        <div
+          data-testid="before-after-grid"
+          className="mt-5 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 md:gap-y-3"
+        >
           <div>
             <p className="font-mono text-[11px] uppercase text-mist">Before</p>
 ```
