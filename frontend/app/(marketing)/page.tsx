@@ -43,7 +43,7 @@ export default function Home() {
             <br />
             Baru Commit.
           </h1>
-          <p className="mt-5 max-w-md text-lg leading-relaxed text-navy/75">
+          <p className="mt-5 max-w-md text-lg leading-relaxed text-slate">
             See the consequences before you commit. KIRA+ consolidates every BNPL plan and loan
             into one score you can audit -- then shows what a new purchase would cost it, before
             you make it.
@@ -54,14 +54,14 @@ export default function Home() {
           </Button>
         </div>
 
-        <div className="relative border border-navy/10 bg-paper p-6">
-          <span className="absolute left-4 top-3 font-mono text-[10px] uppercase tracking-wider text-navy/40">
+        <div className="relative rounded-xl border border-border bg-surface p-6 shadow-card">
+          <span className="absolute left-4 top-3 font-mono text-[10px] uppercase tracking-wider text-mist">
             KIRA score -- live preview
           </span>
           <div className="flex flex-col items-center pt-6">
             <ScoreGauge score={AISYAH.expected.score} band={AISYAH.expected.band} />
           </div>
-          <div className="mt-5 flex flex-col gap-2.5 border-t border-dashed border-navy/15 pt-4">
+          <div className="mt-5 flex flex-col gap-2.5 border-t border-dashed border-border pt-4">
             <StatTile
               label="Monthly buffer"
               value={fmtRm(AISYAH.expected.features.buffer_sen)}
@@ -77,30 +77,30 @@ export default function Home() {
 
       <section className="py-12">
         <h2 className="font-display text-2xl">How it works</h2>
-        <p className="mt-2 max-w-md text-navy/70">
+        <p className="mt-2 max-w-md text-slate">
           Three steps, in order -- each one feeds the next.
         </p>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {STEPS.map((step) => (
             <div key={step.number} className="border-t-2 border-navy pt-4">
-              <span className="font-mono text-sm text-navy/40">{step.number}</span>
+              <span className="font-mono text-sm text-mist">{step.number}</span>
               <h3 className="mt-1.5 font-display text-lg">{step.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-navy/75">{step.description}</p>
+              <p className="mt-2 text-sm leading-relaxed text-slate">{step.description}</p>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="grid gap-8 border-y border-navy/10 bg-navy/[0.02] py-12 md:grid-cols-2">
+      <section className="grid gap-8 border-y border-border bg-surface-alt py-12 md:grid-cols-2">
         <blockquote className="m-0">
           <p className="font-body text-lg italic leading-relaxed">&ldquo;{AISYAH.quote}&rdquo;</p>
-          <cite className="mt-3 block font-mono text-xs not-italic tracking-wide text-navy/50">
+          <cite className="mt-3 block font-mono text-xs not-italic tracking-wide text-mist">
             {AISYAH.label.toUpperCase()}
           </cite>
         </blockquote>
         <blockquote className="m-0">
           <p className="font-body text-lg italic leading-relaxed">&ldquo;{DANIEL.quote}&rdquo;</p>
-          <cite className="mt-3 block font-mono text-xs not-italic tracking-wide text-navy/50">
+          <cite className="mt-3 block font-mono text-xs not-italic tracking-wide text-mist">
             {DANIEL.label.toUpperCase()}
           </cite>
         </blockquote>
