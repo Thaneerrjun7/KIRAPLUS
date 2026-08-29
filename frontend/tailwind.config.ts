@@ -22,11 +22,19 @@ const config: Config = {
         jade: "#1E8E7E",
         gold: "#B7791B",
         paper: "#FBFAF7",
+        surface: "#FFFFFF",
+        surfaceAlt: "#F4F5F5",
+        border: "#E2E4E5",
+        mist: "#919A9F",
+        slate: "#606D75",
         risk: {
-          low: "#1E8E7E", // jade -- LOW RISK
-          moderate: "#B7791B", // songket gold -- MODERATE RISK
-          high: "#B5533C", // clay red (new) -- HIGH RISK
+          low: "#1E8E7E",
+          moderate: "#B7791B",
+          high: "#B5533C",
         },
+      },
+      boxShadow: {
+        card: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
       },
     },
   },
