@@ -108,7 +108,7 @@ export default function DashboardPage() {
           <div className="flex flex-col items-center">
             <ScoreGauge score={assessment.score} band={assessment.band} />
           </div>
-          <p className="mt-5 border-t border-dashed border-navy/15 pt-3.5 text-xs leading-relaxed text-navy/60">
+          <p className="mt-5 border-t border-dashed border-border pt-3.5 text-xs leading-relaxed text-mist">
             {assessment.disclaimer}
           </p>
         </Card>

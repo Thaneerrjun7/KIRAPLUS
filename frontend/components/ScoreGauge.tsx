@@ -36,7 +36,7 @@ export function ScoreGauge({ score, band }: Props) {
           strokeDashoffset={scoreDashOffset(score, CIRCUMFERENCE)}
           className={`score-gauge-fill stroke-risk-${risk}`}
         />
-        <text x={CX} y={CY - 5} textAnchor="middle" className="font-mono text-3xl fill-navy">
+        <text x={CX} y={CY - 5} textAnchor="middle" className="font-mono text-3xl tabular-nums fill-navy">
           {score}
         </text>
       </svg>

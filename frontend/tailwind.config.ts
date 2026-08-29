@@ -1,8 +1,9 @@
 import type { Config } from "tailwindcss";
 
 // Brand palette + risk colors -- see frontend/docs/design.md ("Brand system",
-// "Risk / band colors"). This is the single source; components reference
-// these via class names (bg-risk-low, text-risk-high, etc.), never raw hex.
+// "Risk / band colors") and docs/superpowers/specs/2026-08-29-mobile-shell-redesign-design.md
+// for the full current token list. Components reference these via class names
+// (bg-risk-low, text-risk-high, etc.), never raw hex.
 const config: Config = {
   content: [
     "./app/**/*.{ts,tsx}",
@@ -12,21 +13,28 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        display: ["var(--font-display)", "sans-serif"],
-        body: ["var(--font-body)", "serif"],
-        mono: ["var(--font-mono)", "monospace"],
+        display: ["var(--font-sans)", "sans-serif"],
+        body: ["var(--font-sans)", "sans-serif"],
+        mono: ["var(--font-sans)", "sans-serif"],
       },
       colors: {
         navy: "#0B1F2A",
         teal: "#0F5C56",
         jade: "#1E8E7E",
         gold: "#B7791B",
-        paper: "#FBFAF7",
+        surface: "#FFFFFF",
+        "surface-alt": "#F4F5F5",
+        border: "#E2E4E5",
+        mist: "#919A9F",
+        slate: "#606D75",
         risk: {
-          low: "#1E8E7E", // jade -- LOW RISK
-          moderate: "#B7791B", // songket gold -- MODERATE RISK
-          high: "#B5533C", // clay red (new) -- HIGH RISK
+          low: "#1E8E7E",
+          moderate: "#B7791B",
+          high: "#B5533C",
         },
+      },
+      boxShadow: {
+        card: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)",
       },
     },
   },

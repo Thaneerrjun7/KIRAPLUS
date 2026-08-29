@@ -11,4 +11,12 @@ describe("SyntheticDataNotice", () => {
     expect(screen.getByText(/synthetic/i)).toBeInTheDocument();
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
+
+  it("links to /about so the page is reachable from the app shell", () => {
+    render(<SyntheticDataNotice />);
+    expect(screen.getByRole("link", { name: /synthetic data/i })).toHaveAttribute(
+      "href",
+      "/about",
+    );
+  });
 });

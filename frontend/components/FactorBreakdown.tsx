@@ -52,7 +52,7 @@ export function FactorBreakdown({ subscores, contributions, features }: Props) {
       </div>
 
       <div className="mt-4 flex flex-col gap-2.5">
-        <div className="flex items-baseline font-mono text-[11px] text-navy/40">
+        <div className="flex items-baseline font-mono text-[11px] text-mist">
           <span className="flex-1">FACTOR &middot; WEIGHT &middot; SUB-SCORE &middot; YOUR FIGURE</span>
           <span className="w-20 text-right">CONTRIB.</span>
           <span className="w-24 text-right">STRENGTH</span>
@@ -69,12 +69,12 @@ export function FactorBreakdown({ subscores, contributions, features }: Props) {
             >
               <span className="text-sm">
                 <span>{row.label}</span>{" "}
-                <span className="font-mono text-[11px] text-navy/45">
+                <span className="font-mono text-[11px] text-mist">
                   w{row.weight} &middot; sub {row.subscore.toFixed(2)} &middot; fig {row.rawValue}
                 </span>
               </span>
-              <span className="mb-0.5 flex-1 border-b border-dotted border-navy/30" />
-              <span className="w-20 text-right font-mono text-sm">
+              <span className="mb-0.5 flex-1 border-b border-dotted border-mist" />
+              <span className="w-20 text-right font-mono text-sm tabular-nums">
                 {row.contribution >= 0 ? "+" : ""}
                 {row.contribution.toFixed(2)}
               </span>

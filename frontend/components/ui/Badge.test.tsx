@@ -20,6 +20,6 @@ describe("Badge", () => {
 
   it("defaults to a neutral color when risk is omitted", () => {
     render(<Badge>ADEQUATE</Badge>);
-    expect(screen.getByText("[ADEQUATE]")).toHaveClass("text-navy/50");
+    expect(screen.getByText("[ADEQUATE]")).toHaveClass("text-mist");
   });
 });

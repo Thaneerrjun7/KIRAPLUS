@@ -44,7 +44,7 @@ export function SimulatorPanel({
   return (
     <div className="flex flex-col gap-6">
       <Card className="p-6">
-        <label htmlFor="tenure-slider" className="text-sm font-medium text-navy/80">
+        <label htmlFor="tenure-slider" className="text-sm font-medium text-slate">
           Tenure: {tenure} months
         </label>
         <input
@@ -58,9 +58,12 @@ export function SimulatorPanel({
           className="mt-2 w-full"
         />
 
-        <div className="mt-5 grid grid-cols-2 gap-x-8 gap-y-3">
+        <div
+          data-testid="before-after-grid"
+          className="mt-5 grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2 md:gap-y-3"
+        >
           <div>
-            <p className="font-mono text-[11px] uppercase text-navy/40">Before</p>
+            <p className="font-mono text-[11px] uppercase text-mist">Before</p>
             <div className="mt-2 flex flex-col gap-2">
               <StatTile label="Score" value={String(scoreBefore)} />
               <StatTile label="Band" value={bandBefore} />
@@ -68,7 +71,7 @@ export function SimulatorPanel({
             </div>
           </div>
           <div>
-            <p className="font-mono text-[11px] uppercase text-navy/40">After</p>
+            <p className="font-mono text-[11px] uppercase text-mist">After</p>
             <div className="mt-2 flex flex-col gap-2">
               <StatTile label="Monthly payment" value={fmtRm(current.monthly_sen)} />
               <StatTile label="Score" value={String(current.score)} />
@@ -91,7 +94,7 @@ export function SimulatorPanel({
           {alternatives.map((alt) => (
             <Card key={alt.tenure_months} className="p-4">
               <p className="font-mono text-sm">{alt.tenure_months} months</p>
-              <p className="mt-1 text-sm text-navy/70">{fmtRm(alt.monthly_sen)}/month</p>
+              <p className="mt-1 text-sm text-slate">{fmtRm(alt.monthly_sen)}/month</p>
               <p className="mt-1 font-mono text-sm">
                 score {alt.score} ({alt.delta >= 0 ? "+" : ""}
                 {alt.delta})

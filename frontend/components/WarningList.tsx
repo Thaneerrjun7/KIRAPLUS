@@ -30,7 +30,7 @@ export function WarningList({ warnings }: Props) {
             <div>
               <p className="font-display font-semibold">{warning.title}</p>
               <p>{warning.detail}</p>
-              {warning.lever && <p className="text-sm text-navy/70">{warning.lever}</p>}
+              {warning.lever && <p className="text-sm text-slate">{warning.lever}</p>}
             </div>
           </li>
         );

@@ -4,7 +4,7 @@ const RISK_CLASSES: Record<RiskLevel, string> = {
   low: "text-risk-low",
   moderate: "text-risk-moderate",
   high: "text-risk-high",
-  neutral: "text-navy/50",
+  neutral: "text-mist",
 };
 
 type Props = {
@@ -14,7 +14,7 @@ type Props = {
 
 export function Badge({ children, risk = "neutral" }: Props) {
   return (
-    <span className={`font-mono text-xs font-medium uppercase tracking-wide ${RISK_CLASSES[risk]}`}>
+    <span className={`rounded-xl font-mono text-xs font-medium uppercase tracking-wide ${RISK_CLASSES[risk]}`}>
       [{children}]
     </span>
   );

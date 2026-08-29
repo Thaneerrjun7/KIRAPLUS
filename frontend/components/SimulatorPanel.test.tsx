@@ -114,4 +114,18 @@ describe("SimulatorPanel", () => {
     expect(alternatives.textContent).toContain("score 62");
     expect(alternatives.textContent).not.toContain("12 months");
   });
+
+  it("stacks the Before/After columns to one column below the md breakpoint", () => {
+    render(
+      <SimulatorPanel
+        grid={AISYAH_GRID}
+        tenure={12}
+        onTenureChange={vi.fn()}
+        bandBefore="MODERATE RISK"
+        scoreBefore={68}
+        bufferBeforeSen={95000}
+      />
+    );
+    expect(screen.getByTestId("before-after-grid")).toHaveClass("grid-cols-1", "md:grid-cols-2");
+  });
 });

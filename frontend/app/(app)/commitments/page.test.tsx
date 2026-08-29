@@ -3,7 +3,7 @@
 // Profile.commitments; no separate endpoint" -- this page loads the saved profile via the same
 // profile_id persistence app/profile/page.tsx uses, and re-saves through the same endpoint.
 
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { AISYAH } from "@/lib/fixtures";
 
@@ -45,9 +45,12 @@ describe("CommitmentsPage", () => {
     saveProfile.mockResolvedValue({ profile_id: 7, updated_at: "2026-01-01" });
 
     render(<CommitmentsPage />);
-    await waitFor(() => expect(screen.getByLabelText("Monthly 1")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(within(screen.getByTestId("commitments-desktop")).getByLabelText("Monthly 1")).toBeInTheDocument()
+    );
 
-    fireEvent.change(screen.getByLabelText("Monthly 1"), { target: { value: "200" } });
+    const desktop = within(screen.getByTestId("commitments-desktop"));
+    fireEvent.change(desktop.getByLabelText("Monthly 1"), { target: { value: "200" } });
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
 
     await waitFor(() => expect(saveProfile).toHaveBeenCalled());
@@ -73,7 +76,9 @@ describe("CommitmentsPage", () => {
     saveProfile.mockRejectedValue(new Error("Request failed"));
 
     render(<CommitmentsPage />);
-    await waitFor(() => expect(screen.getByLabelText("Monthly 1")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(within(screen.getByTestId("commitments-desktop")).getByLabelText("Monthly 1")).toBeInTheDocument()
+    );
 
     fireEvent.click(screen.getByRole("button", { name: /save/i }));
 

@@ -10,12 +10,12 @@ describe("Button", () => {
 
   it("applies primary variant classes by default", () => {
     render(<Button>Save</Button>);
-    expect(screen.getByRole("button")).toHaveClass("bg-teal");
+    expect(screen.getByRole("button")).toHaveClass("bg-navy", "rounded-xl");
   });
 
   it("applies secondary variant classes when specified", () => {
     render(<Button variant="secondary">Cancel</Button>);
-    expect(screen.getByRole("button")).toHaveClass("border-navy/20");
+    expect(screen.getByRole("button")).toHaveClass("border-border", "rounded-xl");
   });
 
   it("renders as a link when href is given", () => {
