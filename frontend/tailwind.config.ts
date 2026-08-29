@@ -21,7 +21,6 @@ const config: Config = {
         teal: "#0F5C56",
         jade: "#1E8E7E",
         gold: "#B7791B",
-        paper: "#FBFAF7",
         surface: "#FFFFFF",
         surfaceAlt: "#F4F5F5",
         border: "#E2E4E5",

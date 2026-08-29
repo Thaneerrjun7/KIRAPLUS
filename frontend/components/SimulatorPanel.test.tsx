@@ -116,7 +116,7 @@ describe("SimulatorPanel", () => {
   });
 
   it("stacks the Before/After columns to one column below the md breakpoint", () => {
-    const { container } = render(
+    render(
       <SimulatorPanel
         grid={AISYAH_GRID}
         tenure={12}
