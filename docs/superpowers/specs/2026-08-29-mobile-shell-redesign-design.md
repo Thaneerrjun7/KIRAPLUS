@@ -138,6 +138,7 @@ slate:      '#606D75', // secondary body text, captions — replaces `navy/70`, 
 | `ScoreGauge` | SVG arc unchanged (decided chart choice). Center score number: mono → Inter + `tabular-nums`. |
 | `FactorBreakdown` | Recharts bar chart unchanged (decided chart choice) beyond token colors (already `risk.*`, no change needed). Ledger-line list: fonts/tokens only. |
 | `WarningList`, `VerdictBanner` | Fonts/tokens only — warning-level logic and copy are contract-frozen, untouched. |
+| `SimulatorPanel` | Fonts/tokens only, plus one real layout fix: its Before/After block uses a fixed `grid-cols-2` with no breakpoint — confirmed by inspection during planning to already force two cramped columns at mobile widths today. Stacks to one column below `md`. |
 | `ProfileForm` | Inputs get 12px radius; full-width below `md`, labels always visible (already true). |
 | `CommitmentsTable` | **Desktop (`≥768px`):** today's table, restyled to new tokens/radii. **Mobile (`<768px`):** new stacked-card layout, one card per commitment — header row (label + provider, kind badge top-right), 2×2 field grid (Monthly / Outstanding / Months left / Next due), "Remove commitment" button bottom-left. Approved via visual-companion mockup on 2026-08-29. Summary and Obligations-breakdown cards above the table/cards are unchanged structurally, tokens only. |
 
