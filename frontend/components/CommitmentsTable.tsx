@@ -146,7 +146,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
                       type="number"
                       value={commitment.monthly_sen / 100}
                       onChange={(e) => updateField(index, "monthly_sen", e.target.value)}
-                      className="w-24 rounded-xl border border-border px-2 py-1"
+                      className="w-24 rounded-xl border border-border px-2 py-1 tabular-nums"
                     />
                   </td>
                   <td className="py-2">
@@ -155,7 +155,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
                       type="number"
                       value={commitment.outstanding_sen / 100}
                       onChange={(e) => updateField(index, "outstanding_sen", e.target.value)}
-                      className="w-24 rounded-xl border border-border px-2 py-1"
+                      className="w-24 rounded-xl border border-border px-2 py-1 tabular-nums"
                     />
                   </td>
                   <td className="py-2">
@@ -164,7 +164,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
                       type="number"
                       value={commitment.months_left}
                       onChange={(e) => updateField(index, "months_left", e.target.value)}
-                      className="w-20 rounded-xl border border-border px-2 py-1"
+                      className="w-20 rounded-xl border border-border px-2 py-1 tabular-nums"
                     />
                   </td>
                   <td className="py-2">
@@ -205,14 +205,14 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
                     value={commitment.label}
                     onChange={(e) => updateField(index, "label", e.target.value)}
                     placeholder="Label"
-                    className="w-full rounded-lg border border-border px-2 py-1 text-sm font-semibold"
+                    className="w-full rounded-xl border border-border px-2 py-1 text-sm font-semibold"
                   />
                   <input
                     aria-label={`Provider ${index + 1}`}
                     value={commitment.provider}
                     onChange={(e) => updateField(index, "provider", e.target.value)}
                     placeholder="Provider"
-                    className="mt-1 w-full rounded-lg border border-border px-2 py-1 text-xs text-slate"
+                    className="mt-1 w-full rounded-xl border border-border px-2 py-1 text-xs text-slate"
                   />
                 </div>
                 <select
@@ -236,7 +236,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
                     type="number"
                     value={commitment.monthly_sen / 100}
                     onChange={(e) => updateField(index, "monthly_sen", e.target.value)}
-                    className="mt-0.5 w-full rounded-lg border border-border px-2 py-1 text-sm tabular-nums"
+                    className="mt-0.5 w-full rounded-xl border border-border px-2 py-1 text-sm tabular-nums"
                   />
                 </div>
                 <div>
@@ -246,7 +246,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
                     type="number"
                     value={commitment.outstanding_sen / 100}
                     onChange={(e) => updateField(index, "outstanding_sen", e.target.value)}
-                    className="mt-0.5 w-full rounded-lg border border-border px-2 py-1 text-sm tabular-nums"
+                    className="mt-0.5 w-full rounded-xl border border-border px-2 py-1 text-sm tabular-nums"
                   />
                 </div>
                 <div>
@@ -256,7 +256,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
                     type="number"
                     value={commitment.months_left}
                     onChange={(e) => updateField(index, "months_left", e.target.value)}
-                    className="mt-0.5 w-full rounded-lg border border-border px-2 py-1 text-sm tabular-nums"
+                    className="mt-0.5 w-full rounded-xl border border-border px-2 py-1 text-sm tabular-nums"
                   />
                 </div>
                 <div>
@@ -266,7 +266,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
                     type="date"
                     value={commitment.next_due ?? ""}
                     onChange={(e) => updateField(index, "next_due", e.target.value)}
-                    className="mt-0.5 w-full rounded-lg border border-border px-2 py-1 text-sm"
+                    className="mt-0.5 w-full rounded-xl border border-border px-2 py-1 text-sm"
                   />
                 </div>
               </div>
