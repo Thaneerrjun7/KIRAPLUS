@@ -1,6 +1,6 @@
 "use client";
 
-// App shell nav: /profile, /commitments, /dashboard, /simulator. Desktop (>=768px): top bar, logo
+// App shell nav: /dashboard, /commitments, /simulator, /profile. Desktop (>=768px): top bar, logo
 // left, links right. Mobile (<768px): fixed bottom tab bar. Both render always; Tailwind
 // breakpoint classes (not matchMedia) pick which is visible, so there's no hydration mismatch.
 // See docs/superpowers/specs/2026-08-29-mobile-shell-redesign-design.md section B.
@@ -16,10 +16,10 @@ import {
 } from "@heroicons/react/24/outline";
 
 const LINKS: { href: string; label: string; Icon: ComponentType<{ className?: string }> }[] = [
-  { href: "/profile", label: "Profile", Icon: UserCircleIcon },
-  { href: "/commitments", label: "Commitments", Icon: ListBulletIcon },
   { href: "/dashboard", label: "Dashboard", Icon: ChartBarIcon },
+  { href: "/commitments", label: "Commitments", Icon: ListBulletIcon },
   { href: "/simulator", label: "Simulator", Icon: CalculatorIcon },
+  { href: "/profile", label: "Profile", Icon: UserCircleIcon },
 ];
 
 export function AppNav() {
