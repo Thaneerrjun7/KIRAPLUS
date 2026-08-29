@@ -7,7 +7,12 @@ else the response is discarded in favour of the template; works with
 LLM_API_KEY unset.
 """
 
+from utils.explain import template
+
 
 def explain(payload: dict) -> tuple[str, str]:
     """Return (text, source) where source is "llm" or "template"."""
-    raise NotImplementedError
+    try:
+        return template(payload), "template"
+    except Exception:
+        return "Assessment explanation is currently unavailable.", "template"
