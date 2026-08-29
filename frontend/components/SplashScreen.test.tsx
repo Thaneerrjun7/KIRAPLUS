@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { SplashScreen } from "./SplashScreen";
 
@@ -21,6 +22,20 @@ afterEach(() => {
 });
 
 describe("SplashScreen", () => {
+  it("includes the splash in the very first render, before any effect has run", () => {
+    // Next's static export prerenders with react-dom/server, which never runs useEffect --
+    // renderToStaticMarkup exercises exactly that: a single synchronous render, no effects.
+    // If the splash's visibility depends on an effect to turn it "on", it will be completely
+    // absent from this output -- which is exactly the bug this test catches: the prerendered
+    // HTML (what the browser paints first) would show the real page with no splash at all.
+    const html = renderToStaticMarkup(
+      <SplashScreen>
+        <p>Real page content</p>
+      </SplashScreen>
+    );
+    expect(html).toContain('data-testid="splash-screen"');
+  });
+
   it("renders children alongside the splash overlay", () => {
     render(
       <SplashScreen>

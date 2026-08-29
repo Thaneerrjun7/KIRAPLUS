@@ -20,22 +20,30 @@ type Props = {
 };
 
 export function SplashScreen({ children }: Props) {
-  const [phase, setPhase] = useState<Phase>("hidden");
+  // Defaults to "bouncing", not "hidden" -- this is the value baked into the static export's
+  // prerendered HTML (react-dom/server never runs effects) and into the client's very first paint,
+  // before hydration. Gating the splash's initial visibility behind an effect meant it was entirely
+  // absent from that first paint, so the real page was visible with nothing covering it until
+  // hydration finished and the effect ran. Defaulting to visible and using the effect only to hide
+  // it early (below) closes that gap: the splash is what's on screen from the very first frame.
+  const [phase, setPhase] = useState<Phase>("bouncing");
 
   useEffect(() => {
-    // Whether to show the splash at all depends on sessionStorage/matchMedia, both browser-only --
-    // unavailable during the static export's build-time prerender, so this can't be decided any
-    // earlier than an effect (a lazy useState initializer would crash `next build`). Defaulting to
-    // "hidden" and turning "bouncing" on here, synchronously, is what keeps a hard reload of an
-    // already-visited page in this session from flashing the splash before flipping back off.
-    if (window.sessionStorage.getItem(SESSION_KEY)) return;
+    // Whether to skip the splash depends on sessionStorage/matchMedia, both browser-only --
+    // unavailable during prerender, so this can't be decided any earlier than an effect. Hiding
+    // synchronously here (not queueMicrotask/setTimeout) keeps the already-seen-this-session case
+    // as close to invisible as possible -- it flashes for at most one paint, not a full bounce.
+    if (window.sessionStorage.getItem(SESSION_KEY)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above the effect
+      setPhase("hidden");
+      return;
+    }
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       window.sessionStorage.setItem(SESSION_KEY, "1");
+      setPhase("hidden");
       return;
     }
 
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- see comment above the effect
-    setPhase("bouncing");
     const toLeaving = setTimeout(() => setPhase("leaving"), BOUNCE_MS);
     const toHidden = setTimeout(() => {
       setPhase("hidden");
