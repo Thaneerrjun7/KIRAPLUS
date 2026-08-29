@@ -13,4 +13,9 @@ describe("StatTile", () => {
     render(<StatTile label="After purchase" value="RM750" valueClassName="text-risk-high" />);
     expect(screen.getByText("RM750")).toHaveClass("text-risk-high");
   });
+
+  it("renders the value with tabular figures", () => {
+    render(<StatTile label="Monthly buffer" value="RM950" />);
+    expect(screen.getByText("RM950")).toHaveClass("tabular-nums");
+  });
 });

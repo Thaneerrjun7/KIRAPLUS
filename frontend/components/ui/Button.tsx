@@ -4,12 +4,12 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "reac
 type Variant = "primary" | "secondary";
 
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: "bg-teal text-paper hover:bg-navy",
-  secondary: "border border-navy/20 text-navy hover:bg-navy/5",
+  primary: "bg-navy text-surface hover:opacity-90",
+  secondary: "border border-border text-navy hover:bg-surface-alt",
 };
 
 const BASE_CLASSES =
-  "inline-flex items-center gap-2 px-5 py-2.5 font-display text-sm font-semibold transition-colors";
+  "inline-flex items-center gap-2 rounded-xl px-5 py-2.5 font-display text-sm font-semibold transition-colors";
 
 type CommonProps = {
   variant?: Variant;
