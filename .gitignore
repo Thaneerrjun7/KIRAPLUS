@@ -243,3 +243,6 @@ mock-backend.mjs
 
 # Playwright MCP's own snapshot/screenshot cache
 .playwright-mcp/
+
+# Claude Code's own worktree workspace
+.claude/worktrees/
