@@ -76,7 +76,7 @@ export function CommitmentsTable({ commitments, onChange }: Props) {
           {KINDS.map((kind) => (
             <div key={kind} className="flex items-center gap-2 text-sm">
               <Badge>{kind.toUpperCase()}</Badge>
-              <span className="text-navy/70">
+              <span className="text-slate">
                 {summary.byKind[kind].count} commitments,{" "}
                 {fmtRm(summary.byKind[kind].monthlyTotalSen)}/month
               </span>
