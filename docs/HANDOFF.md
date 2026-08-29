@@ -70,6 +70,24 @@ npm run dev                     # serves the UI on :3000, calls http://localhost
 Both `backend/.env.example` and `frontend/.env.example` are checked in — copy each to `.env` /
 `.env.local` in its own directory; never commit the real files.
 
+## Path beyond the MVP
+
+`docs/MASTER-PACKAGE.md`'s Future Technical Architecture table and Roadmap section name what's
+deliberately not built yet and what triggers building it (mostly "first real user data" / "first
+customer SLA"). Status as of this note:
+
+- ✅ CI test gate (`.github/workflows/ci.yml`) — runs `pytest` + `npm test`/`lint`/`build` on every
+  PR and push to `main`. Previously nothing blocked a broken PR from being mergeable.
+- ✅ Uptime check (`.github/workflows/uptime-check.yml`) — pings the live backend `/health` and the
+  live frontend every 15 minutes; fails (and GitHub emails on workflow failure) if either is down.
+  Not a substitute for a real monitor with push/SMS alerting, just the free first rung of it.
+- 📋 `docs/PDPA-READINESS.md` — a scoping checklist for the formal PDPA/legal review
+  `MASTER-PACKAGE.md`'s risk register (R6) calls for. Not started; has a long lead time independent
+  of engineering work, so it's listed here to start in parallel rather than block on it later.
+- ⏳ Not started, correctly gated on "first real user data": real authentication, migrating off
+  SQLite, structured logging/error tracking/alerting. See `MASTER-PACKAGE.md`'s Future Technical
+  Architecture table for the full trigger list — don't build these ahead of their trigger.
+
 ## What to check before merging this into `main`
 
 `feat/nextjs-fastapi-migration` is flagged **High** level of change in its PR (#3) because it moves
