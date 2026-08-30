@@ -6,33 +6,37 @@ from utils.format import fmt_rm
 
 
 def template(payload: dict) -> str:
-    """Describe already-computed assessment data without new calculations."""
+    """Describe already-computed assessment data without new calculations.
+
+    Reads exactly the fields docs/API-CONTRACT.md §5 promises the payload
+    has. ``warnings`` is a list of warning CODE STRINGS (e.g. "LOW_BUFFER"),
+    never a list of ``{level, title}`` objects, and there is no top-level
+    "features" key -- both were wrong assumptions carried over from an
+    earlier internal payload shape, and every real assessment with at least
+    one warning crashed this function with an AttributeError as a result.
+
+    Only ever echoes a raw payload value (score, buffer, score_after) --
+    never a derived number like a score delta -- so this text always passes
+    its own utils.guard.verify() the same way an LLM response would have to.
+    """
     score = payload.get("score", 0)
     band = payload.get("band", "UNKNOWN")
-    features = payload.get("features", {})
-    warnings = payload.get("warnings", [])
-    buffer_sen = features.get("buffer_sen", 0)
-    dsr = features.get("dsr", 0.0)
-    runway_months = features.get("runway_months", 0.0)
-    n_bnpl = features.get("n_bnpl", 0)
+    buffer_sen = payload.get("buffer_after_sen", payload.get("buffer_before_sen", 0))
+    warnings = payload.get("warnings") or []
+    purchase = payload.get("purchase")
+    score_after = payload.get("score_after")
 
     parts = [
         f"Your KIRA Score is {score} out of 100, placing you in the {band} band.",
-        f"After all monthly obligations, you have {fmt_rm(buffer_sen)} left "
-        f"({dsr:.1%} of income goes to debt service).",
+        f"After all monthly obligations, you have {fmt_rm(buffer_sen)} left each month.",
     ]
-    if runway_months < 1.0:
+    if purchase and score_after is not None:
+        band_after = payload.get("band_after", band)
         parts.append(
-            f"Your savings would cover {runway_months:.1f} months of expenses, "
-            "which is less than one month of runway."
+            f"With this purchase, your score would move to {score_after} out of 100 "
+            f"({band_after})."
         )
-    else:
-        parts.append(f"Your savings would cover {runway_months:.1f} months of expenses.")
-    if n_bnpl:
-        noun = "plan" if n_bnpl == 1 else "plans"
-        parts.append(f"You have {n_bnpl} active BNPL {noun}.")
-    red_warnings = [warning["title"].lower() for warning in warnings if warning.get("level") == "red"]
-    if red_warnings:
-        parts.append(f"Key concerns: {'; '.join(red_warnings)}.")
+    if warnings:
+        parts.append(f"Active warning{'s' if len(warnings) != 1 else ''}: {', '.join(warnings)}.")
     parts.append("This assessment is based on user-provided data and is not financial advice.")
     return " ".join(parts)
