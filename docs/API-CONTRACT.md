@@ -250,6 +250,40 @@ Guarantees the application layer may assume:
 
 ---
 
+## 5b. `projection_service.projection(profile: dict, months: int = 6) -> Projection`
+
+Stage 8. The other half of the simulator's sentence: `simulate()` answers *"what does this new
+purchase cost me?"*, `projection()` answers *"what do I get back, and when, if I add nothing?"*
+
+A commitment with `months_left = k` is paid in months `1..k` and is gone from month `k+1`. Each
+month is scored by the **same** frozen `kira_score`, on a profile whose commitment list is that
+month's survivors and whose savings have accumulated the previous months' unspent buffer (floored at
+zero). Nothing else moves: no raises, no inflation, no new spending. It is a maturity schedule of
+commitments the user already has, **not a forecast**, and the response says so in `assumptions`.
+
+```jsonc
+{
+  "horizon_months": 6,
+  "score_now": 68, "band_now": "MODERATE RISK",
+  "score_final": 85, "band_final": "LOW RISK", "delta": 17,
+  "debt_freed_sen": 25000,
+  "months_to_bnpl_free": 5,          // null when they outlast the horizon
+  "timeline": [
+    {"month": 1, "active_commitments": 3, "debt_sen": 35000, "bnpl_monthly_sen": 25000,
+     "n_bnpl": 2, "buffer_sen": 95000, "savings_sen": 225000, "runway_months": 0.6338,
+     "score": 68, "band": "MODERATE RISK", "delta": 0, "matured": []}
+    // ... one row per month
+  ],
+  "assumptions": "...", "engine_version": "1.0.0", "disclaimer": "..."
+}
+```
+
+`months` is validated to `1..36`; anything else raises `ValidationError(field="months")`. No
+`contract_version` bump: it adds a caller, not a change, to §3's `kira_score` -- every score in the
+timeline is one the existing engine already produces, and no new fixture number is frozen.
+
+---
+
 ## 6. Errors
 
 One exception type crosses the boundary:
@@ -317,6 +351,7 @@ changes what a §2-§5 function returns.
 | `POST /simulate` | `simulation_service.simulate` | `{profile, price_sen, tenure_months}` | `Simulation` |
 | `POST /simulate/grid` | `simulation_service.simulate_grid` | `{profile, price_sen}` | `[{tenure_months, monthly_sen, score, band, delta}]`, tenures 1–36 |
 | `POST /explain` | `llm_service.explain` | payload (§5) | `{text, source}` |
+| `POST /project` | `projection_service.projection` | `{profile, months}` | `Projection` (§5b) |
 | `GET /health` | — | — | `{status: "ok"}` |
 
 Every request/response body is the same integer-sen JSON already defined in §1-§5 — HTTP does not

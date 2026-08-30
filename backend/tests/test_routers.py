@@ -91,3 +91,29 @@ def test_get_demo_profile_returns_unsaved_aisyah(client):
 def test_get_demo_profile_unknown_name_returns_4xx_not_500(client):
     response = client.get("/profiles/demo/not-a-real-persona")
     assert 400 <= response.status_code < 500
+
+
+def test_post_project_returns_a_trajectory(client):
+    response = client.post("/project", json={"profile": _valid_profile(), "months": 6})
+
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body["timeline"]) == 6
+    assert body["timeline"][0]["month"] == 1
+
+
+def test_post_project_with_an_impossible_horizon_returns_4xx_not_500(client):
+    response = client.post("/project", json={"profile": _valid_profile(), "months": 999})
+
+    assert 400 <= response.status_code < 500
+    assert response.json()["field"] == "months"
+
+
+def test_post_explain_returns_text_and_source(client):
+    response = client.post(
+        "/explain",
+        json={"score": 68, "band": "MODERATE RISK", "features": {"buffer_sen": 95000}},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["source"] in {"llm", "template"}
