@@ -6,14 +6,14 @@ Nothing outside the presentation layer may call these.
 
 def fmt_rm(sen: int) -> str:
     """95000 -> "RM950\""""
-    raise NotImplementedError
+    return f"RM{sen // 100}"
 
 
 def fmt_rm_cents(sen: int) -> str:
     """95000 -> "RM950.00\""""
-    raise NotImplementedError
+    return f"RM{sen / 100:.2f}"
 
 
 def to_sen(ringgit: float) -> int:
     """950.0 -> 95000, banker-safe."""
-    raise NotImplementedError
+    return round(ringgit * 100)
