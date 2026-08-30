@@ -17,6 +17,7 @@ COPY backend/services/ backend/services/
 COPY backend/utils/ backend/utils/
 COPY backend/models/ backend/models/
 COPY backend/database/ backend/database/
+COPY backend/prompts/ backend/prompts/
 COPY backend/errors.py backend/errors.py
 COPY backend/docker-entrypoint.sh backend/docker-entrypoint.sh
 
