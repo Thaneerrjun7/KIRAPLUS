@@ -10,7 +10,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.routers import assessments, explanations, profiles, simulations
+from app.routers import assessments, explanations, profiles, projections, simulations
 from errors import ValidationError
 
 app = FastAPI(title="KIRA+ API", version=os.environ.get("KIRA_ENGINE_VERSION", "1.0.0"))
@@ -33,6 +33,7 @@ app.include_router(profiles.router)
 app.include_router(assessments.router)
 app.include_router(simulations.router)
 app.include_router(explanations.router)
+app.include_router(projections.router)
 
 
 @app.get("/health")
