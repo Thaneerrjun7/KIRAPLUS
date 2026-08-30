@@ -16,6 +16,7 @@ variables, not a code change.
 """
 
 import json
+import logging
 import os
 import urllib.error
 import urllib.request
@@ -23,6 +24,8 @@ import urllib.request
 from prompts.advisor_prompts import SYSTEM_PROMPT, build_user_prompt
 from utils.explain import template
 from utils.guard import verify
+
+logger = logging.getLogger(__name__)
 
 DEFAULT_BASE_URL = "https://api.groq.com/openai/v1"
 DEFAULT_MODEL = "llama-3.1-8b-instant"
@@ -76,9 +79,25 @@ def _call_llm(payload: dict, api_key: str) -> str:
         with urllib.request.urlopen(request, timeout=_timeout_seconds()) as response:
             parsed = json.loads(response.read().decode("utf-8"))
         return (parsed["choices"][0]["message"]["content"] or "").strip()
-    except (urllib.error.URLError, OSError, KeyError, IndexError, ValueError, TypeError):
-        # Network down, key rejected, timeout, malformed body -- all the same
-        # outcome as far as the caller is concerned.
+    except urllib.error.HTTPError as exc:
+        # The provider rejected the request outright (bad key, wrong model id,
+        # rate limit, ...) -- the response body usually says exactly why, and
+        # is the single most useful thing to have in a log for this failure
+        # mode. Never logs api_key -- only base_url/model/the provider's own
+        # response.
+        detail = exc.read().decode("utf-8", errors="replace")[:500]
+        logger.warning(
+            "LLM call to %s (model=%s) rejected: HTTP %s %s", base_url, model, exc.code, detail
+        )
+        return ""
+    except (urllib.error.URLError, OSError, KeyError, IndexError, ValueError, TypeError) as exc:
+        # Network down, timeout, malformed body -- all the same outcome as far
+        # as the caller is concerned, but the exception type/message is still
+        # worth a log line: it's the difference between "server unreachable"
+        # and "provider's response didn't look like OpenAI's wire format".
+        logger.warning(
+            "LLM call to %s (model=%s) failed: %s: %s", base_url, model, type(exc).__name__, exc
+        )
         return ""
 
 
@@ -87,21 +106,26 @@ def explain(payload: dict) -> tuple:
     try:
         fallback = template(payload)
     except Exception:
+        logger.exception("template() fallback itself failed")
         fallback = "Assessment explanation is currently unavailable."
 
     try:
         api_key = (os.environ.get("LLM_API_KEY") or "").strip()
         if not api_key:
+            # T-11: no key is the normal/expected case, not a failure -- stays quiet.
             return fallback, "template"
 
         generated = _call_llm(payload, api_key)
         if not generated:
+            # _call_llm already logged the specific reason.
             return fallback, "template"
 
-        ok, _reason = verify(generated, payload)
+        ok, reason = verify(generated, payload)
         if not ok:
+            logger.info("LLM response rejected by guard: %s", reason)
             return fallback, "template"
 
         return generated, "llm"
     except Exception:
+        logger.exception("unexpected error in explain()")
         return fallback, "template"
