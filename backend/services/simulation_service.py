@@ -1,23 +1,23 @@
-"""Before/after simulation for a hypothetical purchase. Must never import fastapi.
+"""Before/after simulation for a hypothetical purchase. Must never import fastapi."""
 
-See docs/API-CONTRACT.md §4, §9.
-"""
+from utils.simulate import simulate as _simulate
 
 
 def simulate(profile: dict, price_sen: int, tenure_months: int) -> dict:
-    """Return the Simulation dict: monthly_sen, before, after, deltas,
-    band_changed, verdict, alternatives.
-    """
-    raise NotImplementedError
+    """Return the contract's full Simulation response."""
+    return _simulate(profile, price_sen, tenure_months)
 
 
 def simulate_grid(profile: dict, price_sen: int) -> list[dict]:
-    """Run simulate() for tenure_months 1..36, return the reduced fields per tenure.
-
-    Lets the frontend fetch once and read grid[tenure - 1] locally while the
-    tenure slider is dragged, instead of one request per slider position. Same
-    maths as simulate(), just batched -- see docs/API-CONTRACT.md §9.
-
-    Returns [{"tenure_months", "monthly_sen", "score", "band", "delta"}, ...].
-    """
-    raise NotImplementedError
+    """Build the slider's compact 1–36 tenure grid in one operation."""
+    return [
+        {
+            "tenure_months": tenure_months,
+            "monthly_sen": result["monthly_sen"],
+            "score": result["after"]["score"],
+            "band": result["after"]["band"],
+            "delta": result["deltas"]["score"],
+        }
+        for tenure_months in range(1, 37)
+        for result in [_simulate(profile, price_sen, tenure_months)]
+    ]

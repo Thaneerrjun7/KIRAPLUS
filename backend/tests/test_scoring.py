@@ -1,20 +1,6 @@
-import json
-import pytest
-
 from utils.features import derive
 from utils.scoring import kira_score
 from utils.format import fmt_rm, fmt_rm_cents, to_sen
-
-
-@pytest.fixture
-def fixtures():
-    with open("data/mock-data.json") as f:
-        return json.load(f)
-
-
-@pytest.fixture
-def personas(fixtures):
-    return fixtures["personas"]
 
 
 def test_t01_score_matches(personas):
