@@ -78,9 +78,17 @@ customer SLA"). Status as of this note:
 
 - ✅ CI test gate (`.github/workflows/ci.yml`) — runs `pytest` + `npm test`/`lint`/`build` on every
   PR and push to `main`. Previously nothing blocked a broken PR from being mergeable.
-- ✅ Uptime check (`.github/workflows/uptime-check.yml`) — pings the live backend `/health` and the
-  live frontend every 15 minutes; fails (and GitHub emails on workflow failure) if either is down.
-  Not a substitute for a real monitor with push/SMS alerting, just the free first rung of it.
+- ❌ Uptime check via GitHub Actions — retired (`.github/workflows/uptime-check.yml` removed). The
+  `*/15 * * * *` cron pinged the live backend `/health` and live frontend from GitHub-hosted runners,
+  but every run failed: `kiraplus.aliffaizuddin.uk` and (before its DNS record was switched to
+  DNS-only/grey cloud) `api-kiraplus.aliffaizuddin.uk` both sit behind Cloudflare, and Cloudflare's
+  free-tier **Bot Fight Mode** issues a `managed_challenge` to GitHub Actions' Azure-hosted runner
+  IPs (`source: "botFight"`, `ruleId: "bot_fight_mode"` in Security → Events) — confirmed via the
+  Cloudflare dashboard that this specific block cannot be scoped or skipped by a Custom Rule on the
+  Free plan (only paid Super Bot Fight Mode supports exceptions), so there was no way to keep this
+  check on GitHub-hosted runners without either disabling Bot Fight Mode zone-wide or self-hosting a
+  runner. Replacing with a real third-party monitor (UptimeRobot or similar) instead — being set up
+  manually, not wired into this repo.
 - 📋 `docs/PDPA-READINESS.md` — a scoping checklist for the formal PDPA/legal review
   `MASTER-PACKAGE.md`'s risk register (R6) calls for. Not started; has a long lead time independent
   of engineering work, so it's listed here to start in parallel rather than block on it later.
