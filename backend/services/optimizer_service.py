@@ -31,6 +31,12 @@ def optimize(profile: dict, extra_sen: int = 0) -> dict:
     commitments = profile.get("commitments")
     if commitments is not None and not isinstance(commitments, list):
         raise ValidationError("commitments must be a list.", field="commitments")
+    for commitment in commitments or []:
+        if not isinstance(commitment, dict):
+            raise ValidationError("Each commitment must be an object.", field="commitments")
+        for field in ("monthly_sen", "outstanding_sen"):
+            if commitment.get(field, 0) < 0:
+                raise ValidationError(f"{field} cannot be negative.", field=field)
 
     result = optimise(profile, extra_sen)
     result["engine_version"] = ENGINE_VERSION

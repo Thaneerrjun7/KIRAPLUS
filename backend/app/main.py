@@ -4,6 +4,7 @@ Wraps services/*.py as HTTP routes for the Next.js frontend. See
 docs/API-CONTRACT.md §9. Must never contain scoring/domain logic itself --
 that stays in services/ and utils/, unchanged by this file.
 """
+import logging
 import os
 import sqlite3
 from contextlib import asynccontextmanager
@@ -21,6 +22,8 @@ from app.routers import (
     simulations,
 )
 from errors import ValidationError
+
+logger = logging.getLogger(__name__)
 
 def _ensure_database() -> None:
     """Create the SQLite schema if this is a first boot against an empty file.
@@ -64,8 +67,10 @@ async def lifespan(app: FastAPI):
     except Exception:
         # An unwritable path must not stop the app booting: /assess, /simulate,
         # /simulate/grid, /project, /optimize and /explain are all stateless and
-        # keep working. Only the profile routes need the file.
-        pass
+        # keep working. Only the profile routes need the file. Logged (not
+        # swallowed silently) so a genuinely broken schema/import doesn't boot
+        # clean and only surface later as an unrelated 500 on first /profiles use.
+        logger.exception("Database bootstrap failed; profile routes will fail until this is fixed")
     yield
 
 

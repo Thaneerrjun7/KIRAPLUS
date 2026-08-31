@@ -118,3 +118,50 @@ def test_the_service_stamps_the_engine_version_and_disclaimer(farah_profile):
 
     assert result["engine_version"]
     assert "Not financial advice." in result["disclaimer"]
+
+
+# --- commitment_id is int | None and is never a safe dict key ---------------
+
+def test_two_unsaved_commitments_sharing_a_null_id_stay_separate(farah_profile):
+    """Regression: balances/labels used to be keyed by commitment_id, so two
+    commitments both `commitment_id: None` (e.g. unsaved drafts) collapsed
+    into one shared balance instead of being paid off independently."""
+    profile = {
+        **farah_profile,
+        "commitments": [
+            {"commitment_id": None, "label": "A", "kind": "bnpl",
+             "monthly_sen": 5_000, "outstanding_sen": 10_000, "apr": 0.0},
+            {"commitment_id": None, "label": "B", "kind": "bnpl",
+             "monthly_sen": 1_000, "outstanding_sen": 100_000, "apr": 0.0},
+        ],
+    }
+
+    result = optimise(profile, extra_sen=0)
+
+    order = result["strategies"]["snowball"]["order"]
+    assert len(order) == 2
+    outstanding = {item["label"]: item["outstanding_sen"] for item in order}
+    assert outstanding == {"A": 10_000, "B": 100_000}
+    # A is the smaller balance -- it must clear on its own, well before B.
+    cleared = {item["label"]: item["cleared_in_month"] for item in order}
+    assert cleared["A"] is not None and cleared["A"] < cleared["B"]
+
+
+def test_the_service_rejects_a_non_object_commitment(farah_profile):
+    profile = {**farah_profile, "commitments": ["not a commitment"]}
+
+    with pytest.raises(ValidationError) as caught:
+        optimize(profile, 0)
+
+    assert caught.value.field == "commitments"
+
+
+def test_the_service_rejects_a_negative_commitment_monthly_sen(farah_profile):
+    commitments = [dict(commitment) for commitment in farah_profile["commitments"]]
+    commitments[0]["monthly_sen"] = -1
+    profile = {**farah_profile, "commitments": commitments}
+
+    with pytest.raises(ValidationError) as caught:
+        optimize(profile, 0)
+
+    assert caught.value.field == "monthly_sen"

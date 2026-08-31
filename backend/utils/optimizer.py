@@ -38,22 +38,31 @@ def _apr(commitment: dict) -> float:
 
 
 def _order(commitments: list, strategy: str) -> list:
-    """Priority order for the extra payment. Ties break deterministically."""
+    """Priority order for the extra payment. Ties break deterministically.
+
+    Tie-break is the commitment's position in the input list, not
+    ``commitment_id`` -- that field is ``int | None`` per the contract, and
+    several unsaved commitments can all be ``None`` at once.
+    """
+    indexed = list(enumerate(commitments))
     if strategy == "avalanche":
         # Highest rate first; equal rates fall back to the smaller balance so
         # the ordering is stable and, at 0% across the board, sensible.
-        key = lambda c: (-_apr(c), c.get("outstanding_sen", 0), c.get("commitment_id", 0))
+        key = lambda pair: (-_apr(pair[1]), pair[1].get("outstanding_sen", 0), pair[0])
     else:
-        key = lambda c: (c.get("outstanding_sen", 0), -_apr(c), c.get("commitment_id", 0))
-    return sorted(commitments, key=key)
+        key = lambda pair: (pair[1].get("outstanding_sen", 0), -_apr(pair[1]), pair[0])
+    return [commitment for _, commitment in sorted(indexed, key=key)]
 
 
 def _run(commitments: list, extra_sen: int, strategy: str) -> dict:
     """Month-by-month payoff simulation for one ordering."""
     ordered = _order(commitments, strategy)
-    balances = {c["commitment_id"]: c.get("outstanding_sen", 0) for c in ordered}
+    # Keyed by object identity, not ``commitment_id`` -- that field can be
+    # ``None`` or repeated across commitments, and would silently merge their
+    # balances into one shared entry.
+    balances = {id(c): c.get("outstanding_sen", 0) for c in ordered}
     labels = {
-        c["commitment_id"]: c.get("label") or c.get("provider") or f"commitment {c['commitment_id']}"
+        id(c): c.get("label") or c.get("provider") or f"commitment {c.get('commitment_id')}"
         for c in ordered
     }
 
@@ -70,7 +79,7 @@ def _run(commitments: list, extra_sen: int, strategy: str) -> dict:
 
         # Interest first, on whatever is still outstanding.
         for commitment in ordered:
-            cid = commitment["commitment_id"]
+            cid = id(commitment)
             if balances[cid] <= 0:
                 continue
             monthly_interest = int(round(balances[cid] * _apr(commitment) / 12))
@@ -79,7 +88,7 @@ def _run(commitments: list, extra_sen: int, strategy: str) -> dict:
 
         # Contractual minimums.
         for commitment in ordered:
-            cid = commitment["commitment_id"]
+            cid = id(commitment)
             if balances[cid] <= 0:
                 continue
             payment = min(commitment.get("monthly_sen", 0), balances[cid])
@@ -94,12 +103,12 @@ def _run(commitments: list, extra_sen: int, strategy: str) -> dict:
         spare = extra_sen + sum(
             commitment.get("monthly_sen", 0)
             for commitment in ordered
-            if balances[commitment["commitment_id"]] <= 0
+            if balances[id(commitment)] <= 0
         )
         for commitment in ordered:
             if spare <= 0:
                 break
-            cid = commitment["commitment_id"]
+            cid = id(commitment)
             if balances[cid] <= 0:
                 continue
             payment = min(spare, balances[cid])
@@ -126,14 +135,14 @@ def _run(commitments: list, extra_sen: int, strategy: str) -> dict:
         "strategy": strategy,
         "order": [
             {
-                "commitment_id": commitment["commitment_id"],
-                "label": labels[commitment["commitment_id"]],
+                "commitment_id": commitment.get("commitment_id"),
+                "label": labels[id(commitment)],
                 "provider": commitment.get("provider"),
                 "kind": commitment.get("kind"),
                 "outstanding_sen": commitment.get("outstanding_sen", 0),
                 "monthly_sen": commitment.get("monthly_sen", 0),
                 "apr": _apr(commitment),
-                "cleared_in_month": cleared_at.get(commitment["commitment_id"]),
+                "cleared_in_month": cleared_at.get(id(commitment)),
             }
             for commitment in ordered
         ],
