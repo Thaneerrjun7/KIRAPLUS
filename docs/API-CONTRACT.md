@@ -284,6 +284,52 @@ timeline is one the existing engine already produces, and no new fixture number 
 
 ---
 
+## 5c. `optimizer_service.optimize(profile: dict, extra_sen: int = 0) -> Optimization`
+
+Stage 9. Returns **both** payoff orderings with their real costs attached, and picks neither.
+
+- **Avalanche** clears the highest `apr` first, ties broken by the smaller balance.
+- **Snowball** clears the smallest `outstanding_sen` first, ties broken by the higher rate.
+
+Each month: interest accrues on outstanding, contractual minimums are paid, then `extra_sen`
+*plus every payment freed by an already-cleared commitment* goes onto the head of the order.
+That rolling snowball is the entire mechanism.
+
+`apr` is an optional per-commitment field defaulting to `0.0`, which is the truth for most
+Malaysian BNPL. When every rate is zero the two orderings cost identically and the response says
+so via `all_zero_interest: true` — an honest zero rather than an implied saving.
+
+**This function deliberately returns no recommendation.** §17's tone rules ban `we recommend` and
+`you should` outright; `test_optimizer.py` asserts no banned string appears anywhere in the
+serialised response. Stating that one order costs RM120 less is a consequence. Telling the user
+which to pick is advice, and KIRA+ does not give advice.
+
+```jsonc
+{
+  "extra_sen": 10000, "has_debt": true, "all_zero_interest": true,
+  "strategies": {
+    "snowball": {
+      "strategy": "snowball",
+      "order": [ {"commitment_id": 4, "label": "Clothing", "outstanding_sen": 12000,
+                  "monthly_sen": 6000, "apr": 0.0, "cleared_in_month": 1} ],
+      "months_to_debt_free": 12,      // null if a payment never clears its interest
+      "total_paid_sen": 845000, "interest_paid_sen": 0,
+      "timeline": [ {"month": 1, "paid_sen": 53000, "remaining_sen": 792000,
+                     "cleared": ["Clothing"]} ]
+    },
+    "avalanche": { /* same shape */ }
+  },
+  "difference": {"months": 0, "interest_sen": 0},
+  "note": "...", "engine_version": "1.0.0", "disclaimer": "..."
+}
+```
+
+`extra_sen` is validated to `0..100000000`; anything else raises `ValidationError(field="extra_sen")`.
+No `contract_version` bump: it reads the existing `Profile.commitments` shape, computes nothing
+§2–§5 already computes, and freezes no new fixture number.
+
+---
+
 ## 6. Errors
 
 One exception type crosses the boundary:
@@ -352,6 +398,7 @@ changes what a §2-§5 function returns.
 | `POST /simulate/grid` | `simulation_service.simulate_grid` | `{profile, price_sen}` | `[{tenure_months, monthly_sen, score, band, delta}]`, tenures 1–36 |
 | `POST /explain` | `llm_service.explain` | payload (§5) | `{text, source}` |
 | `POST /project` | `projection_service.projection` | `{profile, months}` | `Projection` (§5b) |
+| `POST /optimize` | `optimizer_service.optimize` | `{profile, extra_sen}` | `Optimization` (§5c) |
 | `GET /health` | — | — | `{status: "ok"}` |
 
 Every request/response body is the same integer-sen JSON already defined in §1-§5 — HTTP does not

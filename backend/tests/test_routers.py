@@ -117,3 +117,32 @@ def test_post_explain_returns_text_and_source(client):
 
     assert response.status_code == 200
     assert response.json()["source"] in {"llm", "template"}
+
+
+def test_post_optimize_returns_both_orderings(client):
+    profile = {
+        **_valid_profile(),
+        "commitments": [
+            {
+                "commitment_id": 1,
+                "provider": "Atome",
+                "label": "Apparel",
+                "kind": "bnpl",
+                "monthly_sen": 15000,
+                "outstanding_sen": 30000,
+                "months_left": 2,
+            }
+        ],
+    }
+
+    response = client.post("/optimize", json={"profile": profile, "extra_sen": 10000})
+
+    assert response.status_code == 200
+    assert set(response.json()["strategies"]) == {"avalanche", "snowball"}
+
+
+def test_post_optimize_with_a_negative_extra_returns_4xx_not_500(client):
+    response = client.post("/optimize", json={"profile": _valid_profile(), "extra_sen": -1})
+
+    assert 400 <= response.status_code < 500
+    assert response.json()["field"] == "extra_sen"
