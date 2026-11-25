@@ -6,11 +6,13 @@ KIRA+ consolidates every Buy Now Pay Later commitment you hold into one view, sc
 
 *Kira* is Malay for *to calculate*.
 
+**Live demo:** [kiraplus.aliffaizuddin.uk](https://kiraplus.aliffaizuddin.uk/)
+
 ---
 
 ## The problem
 
-As of **Q1 2026**, Malaysians hold **8.0 million active BNPL accounts** carrying **RM5.3 billion** in outstanding balances. RM181 million of that is overdue — 3.4% of total BNPL balances, and 0.3% of national household debt. Across full-year 2025 the market ran **243 million transactions worth RM21.3 billion**, at an average of RM91 each.
+As of **Q1 2026**, Malaysians hold **8.0 million active BNPL accounts** carrying **RM5.3 billion** in outstanding balances. RM181 million of that is overdue — 3.4% of total BNPL balances — while BNPL as a whole is about 0.3% of national household debt. Across full-year 2025 the market ran **243 million transactions worth RM21.3 billion**, an average of about RM88 each.
 
 In the same country, **61% of Malaysians report difficulty raising RM1,000 for an emergency** — up from 47% in 2021.
 
@@ -138,7 +140,7 @@ The four demo personas are constructed to exercise every branch of the scoring e
 - **Domain layer** — pure Python, zero third-party imports, fully unit-testable
 - **ML** — scikit-learn, pandas, NumPy
 - **Data** — SQLite; all monetary values stored as integer sen
-- **Hosting** — Vercel (frontend), a container host such as Render or Fly.io (backend)
+- **Hosting** — the frontend as a static export on Cloudflare Workers, the backend as a Docker image on a DigitalOcean droplet; both deploy from GitHub Actions
 
 The project started on Streamlit for a fast single-process prototype, then split into this two-service
 layout once the team wanted a real frontend framework. The domain layer (`backend/utils/`,
@@ -163,7 +165,7 @@ backend/
   services/                 orchestration — no FastAPI/HTTP imports
   models/                    synthetic generation, Monte-Carlo labels, training, MODEL_CARD.md
   database/                  schema.sql, init_db.py
-  tests/                     12 tests — run before every push
+  tests/                     99 tests — run before every push
 data/                      synthetic profiles, demo personas, knowledge base
 docs/                      master package, API-CONTRACT.md, demo script
 ```
@@ -194,8 +196,9 @@ No configuration required for either. `LLM_API_KEY` is optional — without it, 
 
 ```bash
 cd backend
-pytest -q                  # 12 tests, runs in under 10 seconds
-python utils/scoring.py    # prints the four persona fixtures: 68 / 94 / 41 / 17
+pytest -q                  # 99 backend tests
+cd ../frontend
+npm test                   # 152 frontend tests (Vitest)
 ```
 
 ---
@@ -214,7 +217,7 @@ Built for the **MAIC Nexus Challenge 2026**, Track T3 — AI for Financial Servi
 
 ## Status
 
-Early development. **Not a licensed financial service.**
+Prototype completed for the MAIC Nexus Challenge 2026. **Not a licensed financial service.**
 
 KIRA+ provides information and planning tools only. It does not provide financial advice, does not make lending decisions, does not predict or replace a CTOS score, and is not a substitute for advice from AKPK or a licensed adviser.
 
